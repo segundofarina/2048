@@ -17,6 +17,8 @@ typedef struct {
     //int ** matriz;
     int matriz[4][4];
     int dim;
+    int undos;
+    int puntaje;
 } tablero;
 
 
@@ -36,6 +38,11 @@ void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva){
                 nueva->matriz[k][h]=0;//casillero actual vacio
                 sume=1;//aviso que la proxima pasada no tengo que sumar
                 /*IMPORTANTE no muevo el contador de la matriz nueva para volver al casillero que vacie*/
+
+                /*sumo puntaje*/
+                nueva->puntaje+=nueva->matriz[k-I.incremento][h-J.incremento];
+
+
             }else{
                 sume=0;//aviso que puedo sumar la proxima pasada
                 k+=I.incremento;
@@ -114,11 +121,12 @@ int main(){
         }
         printf("\n");
     }
+    printf("**** Puntaje: %d\n", tablero1.puntaje);
 
 
 printf("\n\n**********************\n\n");
 
-    muevoTablero(3,tablero1,&tablero2);
+    muevoTablero(1,tablero1,&tablero2);
 
     for(int p=0;p<tablero1.dim;p++){
         for(int o=0;o<tablero1.dim;o++){
@@ -126,6 +134,7 @@ printf("\n\n**********************\n\n");
         }
         printf("\n");
     }
+    printf("**** Puntaje: %d\n", tablero2.puntaje);
 
 
     return 0;
