@@ -32,8 +32,6 @@ void sumoFila(movimiento I, movimiento J, const int m[][DIM], int nueva[][DIM]){
     }
 }
 
-<<<<<<< HEAD
-=======
 
 void muevoTablero(const int m[][DIM], int nueva[][DIM]){
 
@@ -43,4 +41,3 @@ void muevoTablero(const int m[][DIM], int nueva[][DIM]){
         sumoFila(i,0,4,4,0,1,m,nueva);
     }
 }
->>>>>>> origin/master
