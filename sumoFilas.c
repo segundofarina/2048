@@ -18,4 +18,9 @@ void sumoFila(int inicioI, int inicioJ, int finalI, int finalJ, int incrementoI,
             }
         }
     }
+    for( ; k!=finalI && h!=finalJ; k+=incrementoI, h+=incrementoJ ){//relleno con 0 al final de la fila-columna
+        nueva[k][h]=0;
+    }
 }
+
+
