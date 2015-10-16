@@ -27,5 +27,20 @@ void sumoFila(movimiento I, movimiento J, const int m[][DIM], int nueva[][DIM]){
             }
         }
     }
+    for( ; k!=finalI && h!=finalJ; k+=incrementoI, h+=incrementoJ ){//relleno con 0 al final de la fila-columna
+        nueva[k][h]=0;
+    }
 }
 
+<<<<<<< HEAD
+=======
+
+void muevoTablero(const int m[][DIM], int nueva[][DIM]){
+
+    //si me muevo para la izq
+    for (int i = 0; i < DIM; i++)
+    {
+        sumoFila(i,0,4,4,0,1,m,nueva);
+    }
+}
+>>>>>>> origin/master

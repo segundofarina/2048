@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+//me llego
+
 void ImprimirBolillero(char bolillero[], int restantes){
 	int i;
 	for(i=0; i<restantes; i++)
