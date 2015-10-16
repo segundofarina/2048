@@ -1,22 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define IZQUIERDA 1
+#define ARRIBA 2
+#define DERECHA 3
+#define ABAJO 4
+
+
 typedef struct{
     int inicio;
     int final;
     int incremento;
 
 } movimiento;
+typedef struct {
+    //int ** matriz;
+    int matriz[4][4];
+    int dim;
+} tablero;
 
 
+void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva){
 
-void sumoFila(movimiento I, movimiento J, const int m[][DIM], int nueva[][DIM]){
-    int i,j,k=inicioI, h=inicioJ, sume=0;
-    
+    int i,j,k=I.inicio, h=J.inicio, sume=0;
+
     for( i=I.inicio, j=J.inicio; i!=I.final && j!=J.final; i+=I.incremento, j+=J.incremento ){//recorro la fila o la columna dependiendo de los paramentros
-        if(m[i][j]!=0){//salteo casilleros vacios
-            nueva[k][h]=m[i][j];//copio los casilleros llenos a la matriz nueva
+        
+        if(m.matriz[i][j]!=0){//salteo casilleros vacios
+            
+            nueva->matriz[k][h]=m.matriz[i][j];//copio los casilleros llenos a la matriz nueva
             /*voy a fijarme si el numero que acabo de copiar se deberia sumar para combinar con el anterior de la fila-columna */
-            if( (k!=I.inicio || h!=J.inicio) && !sume && nueva[k][h]==nueva[k-I.incremento][h-J.incremento]){//si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico si el numero es igual al casillero anterior
-                nueva[k-I.incremento][h-J.incremento]*=2;//casillero anterior por 2
-                nueva[k][h]=0;//casillero actual vacio
+            if( (k!=I.inicio || h!=J.inicio) && !sume && nueva->matriz[k][h]==nueva->matriz[k-I.incremento][h-J.incremento]){//si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico si el numero es igual al casillero anterior
+                
+                nueva->matriz[k-I.incremento][h-J.incremento]*=2;//casillero anterior por 2
+                nueva->matriz[k][h]=0;//casillero actual vacio
                 sume=1;//aviso que la proxima pasada no tengo que sumar
                 /*IMPORTANTE no muevo el contador de la matriz nueva para volver al casillero que vacie*/
             }else{
@@ -27,17 +44,90 @@ void sumoFila(movimiento I, movimiento J, const int m[][DIM], int nueva[][DIM]){
             }
         }
     }
-    for( ; k!=finalI && h!=finalJ; k+=incrementoI, h+=incrementoJ ){//relleno con 0 al final de la fila-columna
-        nueva[k][h]=0;
+    for( ; k!=I.final && h!=J.final; k+=I.incremento, h+=J.incremento ){//relleno con 0 al final de la fila-columna
+        nueva->matriz[k][h]=0;
     }
 }
 
 
-void muevoTablero(const int m[][DIM], int nueva[][DIM]){
+void descifroMovimiento (int direccion, movimiento * I, movimiento * J,int dim){
 
-    //si me muevo para la izq
-    for (int i = 0; i < DIM; i++)
+    switch(direccion){
+        case IZQUIERDA:
+            I->inicio=0;
+            J->inicio=0;
+            I->final=dim;
+            J->final=dim;
+            I->incremento=0;
+            J->incremento=1;
+        break;
+        case ARRIBA:
+            I->inicio=0;
+            J->inicio=0;
+            I->final=dim;
+            J->final=dim;
+            I->incremento=1;
+            J->incremento=0;
+        break;
+        case DERECHA:
+            I->inicio=0;
+            J->inicio=dim-1;
+            I->final=dim;
+            J->final=-1;
+            I->incremento=0;
+            J->incremento=-1;
+        break;
+        case ABAJO:
+            I->inicio=dim-1;
+            J->inicio=0;
+            I->final=-1;
+            J->final=dim;
+            I->incremento=-1;
+            J->incremento=0;
+        break;
+    }
+}
+
+
+void muevoTablero(int direccion, tablero viejo, tablero * nuevo){
+    /*Creo los dos sentidos de movimiento y recorro la matriz llamando a la funcion que suma las filas en sentido opuesto a la direccion*/
+    movimiento I,J;
+
+    descifroMovimiento(direccion,&I,&J,viejo.dim);
+
+    for ( ; I.inicio!=I.final && J.inicio!=J.final; I.inicio+=abs(J.incremento), J.inicio+=abs(I.incremento) )
     {
-        sumoFila(i,0,4,4,0,1,m,nueva);
+        sumoFila(I,J,viejo,nuevo);
+
     }
 }
+
+int main(){
+
+    tablero tablero1={ { {2,2,4,0},{4,2,2,0},{8,4,4,8},{2,0,2,2} }, 4 },tablero2={ {{1,0}}, 4 };
+
+    int i,j;
+
+    for(i=0;i<tablero1.dim;i++){
+        for(j=0;j<tablero1.dim;j++){
+            printf("%d\t", tablero1.matriz[i][j]);
+        }
+        printf("\n");
+    }
+
+
+printf("\n\n**********************\n\n");
+
+    muevoTablero(3,tablero1,&tablero2);
+
+    for(int p=0;p<tablero1.dim;p++){
+        for(int o=0;o<tablero1.dim;o++){
+            printf("%d\t", tablero2.matriz[p][o]);
+        }
+        printf("\n");
+    }
+
+
+    return 0;
+}
+
