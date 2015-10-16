@@ -24,3 +24,11 @@ void sumoFila(int inicioI, int inicioJ, int finalI, int finalJ, int incrementoI,
 }
 
 
+void muevoTablero(const int m[][DIM], int nueva[][DIM]){
+
+    //si me muevo para la izq
+    for (int i = 0; i < DIM; i++)
+    {
+        sumoFila(i,0,4,4,0,1,m,nueva);
+    }
+}
