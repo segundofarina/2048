@@ -25,7 +25,16 @@ typedef struct{
     int matriz[16][2];
     int num;
 } casVacios;
+void ImprimirTablero( tablero tablero){
+    int i,j;
 
+    for(i=0;i<tablero.dim;i++){
+        for(j=0;j<tablero.dim;j++){
+            printf("%d\t", tablero.matriz[i][j]);
+        }
+        printf("\n");
+    }
+}
 
 void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios * vacios){
 
@@ -120,33 +129,33 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vac
 
     }
 }
+int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimiento es valido 0 si es invalido
+    int i,j,valido=0;
+    for(i=0; i<viejo.dim && !valido; i++){
+        for (j=0; j<viejo.dim && !valido; j++){
+            if (viejo.matriz[i][j]!=nuevo.matriz[i][j]){
+                valido=1;
+            }
+        }
+    }
+    return valido;
+}
 
 int main(){
 
     tablero tablero1={ { {2,2,4,0},{4,2,2,0},{8,4,4,8},{2,2,2,2} }, 4 },tablero2={ {{1,0}}, 4 };
     casVacios vacios;
 
-    int i,j;
-
-    for(i=0;i<tablero1.dim;i++){
-        for(j=0;j<tablero1.dim;j++){
-            printf("%d\t", tablero1.matriz[i][j]);
-        }
-        printf("\n");
-    }
+    ImprimirTablero (tablero1);
     printf("**** Puntaje: %d\n", tablero1.puntaje);
 
 
 printf("\n\n**********************\n\n");
 
     muevoTablero(2,tablero1,&tablero2,&vacios);
-
-    for(int p=0;p<tablero1.dim;p++){
-        for(int o=0;o<tablero1.dim;o++){
-            printf("%d\t", tablero2.matriz[p][o]);
-        }
-        printf("\n");
-    }
+    printf("%d es valido\n",verificoMovimiento (tablero1, tablero2) );
+   
+    ImprimirTablero (tablero2);
     printf("**** Puntaje: %d\n", tablero2.puntaje);
 
 
@@ -157,7 +166,6 @@ printf("\n\n**********************\n\n");
         printf("%d\t%d", vacios.matriz[p][0],vacios.matriz[p][1]);
         printf("\n");
     }
-
 
     return 0;
 }
