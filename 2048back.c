@@ -35,19 +35,13 @@ void creoTablero (tablero * tablero, int dim){
     }
 }
 
-void creoCasvacios (casVacios * casVacios, int dim){
-	int i,j,h=0;
+void creoCasvacios (casVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
+	int i,j;
 	casVacios->num=dim*dim;
 	casVacios->matriz= malloc(dim*dim*sizeof(int* ));
 	for(i=0;i<dim*dim; i++){
         casVacios->matriz[i]= malloc(2*sizeof(int ));
     }
-	for(i=0; i<dim; i++){
-		for(j=0; j<dim; j++){
-		casVacios->matriz[h][0]=i;
-		casVacios->matriz[h++][1]=j;
-	}
-	}
 }
 
 int main(){
@@ -56,10 +50,8 @@ int main(){
 	creoTablero (&tablero1,4);
 	creoCasvacios (&casVacios, 4);
 
-	for (int i = 0; i < 16; ++i)
-	{
-		printf("%d\t%d\n",casVacios.matriz[i][0], casVacios.matriz[i][1] );
-	}
+	
+
 
 	return 0;
 
