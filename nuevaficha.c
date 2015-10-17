@@ -10,8 +10,8 @@ typedef struct{
 
 int randInt(int inicio, int final){
 	int aux;
-	aux=rand%(final+1)+inicio;
-return aux;
+	aux=rand()%(final+1)+inicio;
+	return aux;
 
 }
 
@@ -35,6 +35,19 @@ void buscoCasillero(casVacios vacios, int * posI, int *posJ){
 }
 
 int main(){
+
 	srand(time(NULL));
+
+	int posI,posJ;
+
+	casVacios vacios={ { {0,2},{0,3},{1,2},{1,3},{2,3},{3,2},{3,3} }, 7 };
+
+	printf("%d\n", nuevaFicha());
+
+	buscoCasillero(vacios,&posI,&posJ);
+
+	printf("%d\t%d\n", posI, posJ);
+
+
 	return 0;
 }
