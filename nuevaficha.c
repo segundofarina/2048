@@ -18,7 +18,7 @@ int randInt(int inicio, int final){
 
 int nuevaFicha(){
 
-	int alearorio = randInt(0,100);
+	int alearorio = randInt(1,100);
 	if(alearorio<=89){
 		return 2;
 	}else{
