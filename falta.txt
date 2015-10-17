@@ -4,13 +4,9 @@ verificar en sumoLineas cuando llego al numero ganador
 
 verificar si hay movimientos validos 
 
-<<<<<<< HEAD
-funciones de undo 
-=======
-rotar tableros
-
 funciones de undo
->>>>>>> origin/master
+ 
+rotar tableros
 
 funciones de save
 
