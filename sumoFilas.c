@@ -111,7 +111,7 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo){
 
 int main(){
 
-    tablero tablero1={ { {2,2,4,0},{4,2,2,0},{8,4,4,8},{2,0,2,2} }, 4 },tablero2={ {{1,0}}, 4 };
+    tablero tablero1={ { {2,2,4,0},{4,2,2,0},{8,4,4,8},{2,2,2,2} }, 4 },tablero2={ {{1,0}}, 4 };
 
     int i,j;
 
