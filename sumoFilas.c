@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "nuevaficha.c"
 
 #define IZQUIERDA 1
 #define ARRIBA 2
@@ -27,6 +26,7 @@ typedef struct{
     int matriz[16][2];
     int num;
 } casVacios;
+#include "nuevaficha.c"
 void ImprimirTablero( tablero tablero);
 
 
@@ -123,21 +123,10 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vac
 
     }
 }
-int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimiento es valido 0 si es invalido
-    int i,j,valido=0;
-    for(i=0; i<viejo.dim && !valido; i++){
-        for (j=0; j<viejo.dim && !valido; j++){
-            if (viejo.matriz[i][j]!=nuevo.matriz[i][j]){
-                valido=1;
-            }
-        }
-    }
-    return valido;
-}
+
 
 int main(){
     srand(time(NULL));
-
 /*lo que deberia hacerse en creoTablero*/
     tablero tablero1={ { {2,2,4,0},{4,2,2,0},{8,4,4,8},{2,2,2,2} }, 4 },tablero2={ {{1,0}}, 4 };
     casVacios vacios;
@@ -152,7 +141,6 @@ printf("\n\n**********************\n\n");
 
 
     muevoTablero(2,tablero1,&tablero2,&vacios);
-    printf("%d es valido\n",verificoMovimiento (tablero1, tablero2) );
    
     ImprimirTablero (tablero2);//muestro tablero despues de mover el tablero
 
