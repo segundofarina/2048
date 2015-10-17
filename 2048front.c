@@ -11,12 +11,15 @@ typedef struct {
     int puntaje;
 } tablero;
 
+void presentacion(){
+	printf("***********************************\n");
+	printf("*                                 *\n");
+	printf("*       Bienvenidos al 2048       *\n");
+	printf("*                                 *\n");
+	printf("***********************************\n\n");
+}
+
 int opcion(){
-	printf("********************************\n");
-	printf("*                              *\n");
-	printf("*       Bienvenidos al 2048    *\n");
-	printf("*                              *\n");
-	printf("********************************\n\n");
 	printf("ELIJA UNA OPCION:\n");
 	printf("1-Juego nuevo\n");
 	printf("2-Recuperar un juego guardado\n");
@@ -42,6 +45,7 @@ void ImprimirTablero( tablero tablero){
 }
 
 int main(){
+	presentacion();
 	if (opcion()==1){
 		juegoNuevo();
 	}
