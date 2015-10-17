@@ -1,0 +1,11 @@
+verificar en sumoLineas cuando llego al numero ganador
+
+verificar si hay movimientos validos
+
+aleatorio para elejir casillero vacio
+
+funciones de undo
+
+funciones de save
+
+TODO EL FRONT
