@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "nuevaficha.c"
 
 #define IZQUIERDA 1
 #define ARRIBA 2
@@ -26,21 +27,8 @@ typedef struct{
     int matriz[16][2];
     int num;
 } casVacios;
-void ImprimirTablero( tablero tablero){
-    int i,j;
+void ImprimirTablero( tablero tablero);
 
-<<<<<<< HEAD
-    for(i=0;i<tablero.dim;i++){
-        for(j=0;j<tablero.dim;j++){
-            printf("%d\t", tablero.matriz[i][j]);
-        }
-        printf("\n");
-    }
-}
-=======
-#include "nuevaficha.c"
-
->>>>>>> origin/master
 
 void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios * vacios){
 
@@ -188,4 +176,12 @@ printf("\n\n**********************\n\n");
 
     return 0;
 }
-
+void ImprimirTablero( tablero tablero){
+    int i,j;
+    for(i=0;i<tablero.dim;i++){
+        for(j=0;j<tablero.dim;j++){
+            printf("%d\t", tablero.matriz[i][j]);
+        }
+        printf("\n");
+    }
+}
