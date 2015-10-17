@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define IZQUIERDA 1
 #define ARRIBA 2
@@ -28,6 +29,7 @@ typedef struct{
 void ImprimirTablero( tablero tablero){
     int i,j;
 
+<<<<<<< HEAD
     for(i=0;i<tablero.dim;i++){
         for(j=0;j<tablero.dim;j++){
             printf("%d\t", tablero.matriz[i][j]);
@@ -35,6 +37,10 @@ void ImprimirTablero( tablero tablero){
         printf("\n");
     }
 }
+=======
+#include "nuevaficha.c"
+
+>>>>>>> origin/master
 
 void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios * vacios){
 
@@ -142,30 +148,43 @@ int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimie
 }
 
 int main(){
+    srand(time(NULL));
 
+/*lo que deberia hacerse en creoTablero*/
     tablero tablero1={ { {2,2,4,0},{4,2,2,0},{8,4,4,8},{2,2,2,2} }, 4 },tablero2={ {{1,0}}, 4 };
     casVacios vacios;
+/**/
 
-    ImprimirTablero (tablero1);
+    ImprimirTablero (tablero1);//muestro tablero inicial sin modificaciones
+
     printf("**** Puntaje: %d\n", tablero1.puntaje);
 
 
 printf("\n\n**********************\n\n");
 
+
     muevoTablero(2,tablero1,&tablero2,&vacios);
     printf("%d es valido\n",verificoMovimiento (tablero1, tablero2) );
    
-    ImprimirTablero (tablero2);
+    ImprimirTablero (tablero2);//muestro tablero despues de mover el tablero
+
     printf("**** Puntaje: %d\n", tablero2.puntaje);
 
 
 printf("\n\n**********************\n\n");
 
-    printf("I\tJ\n");
-    for(int p=0;p<vacios.num;p++){
-        printf("%d\t%d", vacios.matriz[p][0],vacios.matriz[p][1]);
+    pongoFicha(&tablero2,vacios);/*******************/
+
+
+    for(int p=0;p<tablero1.dim;p++){//muestro tablero movido y con la ficha nueva agregada
+        for(int o=0;o<tablero1.dim;o++){
+            printf("%d\t", tablero2.matriz[p][o]);
+        }
         printf("\n");
     }
+    printf("**** Puntaje: %d\n", tablero2.puntaje);
+
+    
 
     return 0;
 }
