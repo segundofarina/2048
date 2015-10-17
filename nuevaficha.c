@@ -9,12 +9,14 @@ typedef struct{
 } casVacios;
 
 int randInt(int inicio, int final){
+	int aux;
+	aux=rand%(final+1)+inicio;
+return aux;
 
 }
 
 
 int nuevaFicha(){
-	srand(time(NULL));
 
 	int alearorio = randInt(0,100);
 	if(alearorio<=89){
@@ -25,7 +27,6 @@ int nuevaFicha(){
 }
 
 void buscoCasillero(casVacios vacios, int * posI, int *posJ){
-	srand(time(NULL));
 
 	int alearorio=randInt(0,(vacios.num)-1);
 
@@ -34,6 +35,6 @@ void buscoCasillero(casVacios vacios, int * posI, int *posJ){
 }
 
 int main(){
-
+	srand(time(NULL));
 	return 0;
 }
