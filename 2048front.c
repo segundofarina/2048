@@ -20,18 +20,26 @@ void presentacion(){
 }
 
 int opcion(){
+	int resp;
 	printf("ELIJA UNA OPCION:\n");
 	printf("1-Juego nuevo\n");
 	printf("2-Recuperar un juego guardado\n");
 	printf("3-Salir\n");
-	return getint("");
+	do {
+		resp=getint("");
+	}while (resp >3 || resp<1);
+	return resp;
 }
 int juegoNuevo(){
+	int resp;
 	printf("\nELIJA UNA DIFICULTAD:\n");
 	printf("1-Facil\n");
 	printf("2-Intermedio\n");
 	printf("3-Dificil\n");
-	return getint("");
+	do {
+		resp=getint("");
+	}while (resp >3 || resp<1);
+	return resp;
 }
 
 void ImprimirTablero( tablero tablero){
@@ -45,10 +53,14 @@ void ImprimirTablero( tablero tablero){
 }
 
 int main(){
+	int resp;
 	presentacion();
-	if (opcion()==1){
-		juegoNuevo();
+	resp=opcion();
+	if (resp==1){
+		resp=juegoNuevo();
 	}
+
+	return 0;
 
 
 }
