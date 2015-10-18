@@ -169,6 +169,8 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vac
 
     descifroMovimiento(direccion,&I,&J,viejo.dim);
 
+    nuevo->puntaje=viejo.puntaje;
+
     vacios->num=0;//inicializo el contador de la matriz que guarda los vacios
 
     for ( ; I.inicio!=I.final && J.inicio!=J.final; I.inicio+=abs(J.incremento), J.inicio+=abs(I.incremento) )
@@ -213,12 +215,15 @@ int main(){
 	while((direccion=getint("Para que lado moves??\n"))!=5){
 		muevoTablero(direccion,tablero1,&tablero2,&casVacios);
         //swapTableros (&tablero1, &tablero2);
-		aux.matriz=tablero1.matriz;
+		/*aux.matriz=tablero1.matriz;
 		tablero1.matriz=tablero2.matriz;
 		tablero2.matriz=aux.matriz;
         /*aux.puntaje=tablero1.puntaje;
         tablero1.puntaje=tablero2.puntaje;
         tablero2.puntaje=aux.puntaje;*/
+        aux=tablero1;
+        tablero1=tablero2;
+        tablero2=aux;
 		pongoFicha (&tablero1,casVacios);
 		printf("\n");
 
