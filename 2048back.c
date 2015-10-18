@@ -31,6 +31,7 @@ void Imprimecasvacios (casVacios casVacios);
 
 void creoTablero (tablero * tablero, int dim){
     int i;
+    tablero->puntaje=0;
     tablero->dim=dim;
     tablero->matriz=(int **) calloc(tablero->dim,sizeof(int*));
     for(i=0;i<tablero->dim; i++){
@@ -39,11 +40,17 @@ void creoTablero (tablero * tablero, int dim){
 }
 
 void creoCasvacios (casVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
-	int i,j;
-	casVacios->num=dim*dim;
+	int i,j,h=0;
+	casVacios->num=dim*dim;//Incicializa cantidad de casilleros en dim*dim 
 	casVacios->matriz= malloc(dim*dim*sizeof(int* ));
 	for(i=0;i<dim*dim; i++){
         casVacios->matriz[i]= malloc(2*sizeof(int ));
+    }
+    for(i=0;i<dim;i++){ //Guarda la posicion de todos los casilleros de la matriz
+        for(j=0;j<dim;j++){
+            casVacios->matriz[h][0]=i;
+            casVacios->matriz[h++][1]=j;
+        }
     }
 }
 int randInt(int inicio, int final){//aleatorio entre inicio y final
@@ -63,7 +70,7 @@ int nuevaFicha(){//aleatorio 2 o 4
 	}
 }
 
-void buscoCasillero(casVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametor
+void buscoCasillero(casVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
 
 	int alearorio=randInt(0,(vacios.num)-1);
 
@@ -170,7 +177,13 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vac
 
     }
 }
-
+void swapTableros (tablero * tablero1, tablero * tablero2){
+    tablero * aux;
+    aux->matriz=tablero1->matriz;
+    tablero1->matriz=tablero2->matriz;
+    tablero2->matriz=aux->matriz;
+    return ;
+}
 
 
 int main(){
@@ -183,6 +196,7 @@ int main(){
 	creoTablero (&tablero1,4);
 	creoTablero (&tablero2,4);
 	creoCasvacios (&casVacios, 4);
+    Imprimecasvacios(casVacios);
 	ImprimirTablero(tablero1);
 	pongoFicha (&tablero1,casVacios);
 	ImprimirTablero (tablero1);
@@ -198,11 +212,16 @@ int main(){
 	}*/
 	while((direccion=getint("Para que lado moves??\n"))!=5){
 		muevoTablero(direccion,tablero1,&tablero2,&casVacios);
+        //swapTableros (&tablero1, &tablero2);
 		aux.matriz=tablero1.matriz;
 		tablero1.matriz=tablero2.matriz;
 		tablero2.matriz=aux.matriz;
+        /*aux.puntaje=tablero1.puntaje;
+        tablero1.puntaje=tablero2.puntaje;
+        tablero2.puntaje=aux.puntaje;*/
 		pongoFicha (&tablero1,casVacios);
 		printf("\n");
+
 		ImprimirTablero (tablero1);
 
 	}
@@ -215,6 +234,7 @@ int main(){
 
 void ImprimirTablero( tablero tablero){
     int i,j;
+    printf("PUNTAJE:%d\n",tablero.puntaje);
     for(i=0;i<tablero.dim;i++){
         for(j=0;j<tablero.dim;j++){
             printf("%d\t", tablero.matriz[i][j]);
@@ -225,6 +245,7 @@ void ImprimirTablero( tablero tablero){
 }
 
 void Imprimecasvacios (casVacios casVacios){
+    printf("NUM=%d\n",casVacios.num );
 	for (int i = 0; i < casVacios.num; ++i)
 	{
 		printf("%d\t%d\n",casVacios.matriz[i][0], casVacios.matriz[i][1] );
