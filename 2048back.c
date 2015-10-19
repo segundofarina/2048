@@ -235,10 +235,17 @@ int main(){
 			}
 		}else if(direccion==1 || direccion==2 || direccion==3 || direccion==4){//si es movimiento valido
 			muevoTablero(direccion,tablero1,&tablero2,&casVacios);
-	        swapTableros (&tablero1, &tablero2, &tableroAux);
-			pongoFicha (&tablero1,casVacios);
-			hiceUndo=0;
-            printf("\n");
+            if (verificoMovimiento(tablero1,tablero2)){
+                swapTableros (&tablero1, &tablero2, &tableroAux);
+                pongoFicha (&tablero1,casVacios);
+                hiceUndo=0;
+                printf("\n");
+            }
+            else {
+                ImprimirTablero(tableroAux);
+                tablero2=tableroAux;
+                hiceUndo=0;
+            }
 
             ImprimirTablero (tablero1);
 		}else{//error
