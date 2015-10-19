@@ -192,6 +192,19 @@ void undo(tablero * tablero1, tablero * tablero2, tablero * aux){
 	(tablero2->undos)--;
 }
 
+int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimiento es valido 0 si es invalido
+    int i,j,valido=0;
+    for(i=0; i<viejo.dim && !valido; i++){
+        for (j=0; j<viejo.dim && !valido; j++){
+            if (viejo.matriz[i][j]!=nuevo.matriz[i][j]){
+                valido=1;
+            }
+        }
+    }
+    return valido;
+}
+
+
 int main(){
 	srand(time(NULL));
 	int direccion,hiceUndo=1;
@@ -201,6 +214,7 @@ int main(){
 	casVacios casVacios;
 	creoTablero (&tablero1,4,3);
 	creoTablero (&tablero2,4,3);
+    creoTablero (&tableroAux,4,3);
 	creoCasvacios (&casVacios, 4);
     //Imprimecasvacios(casVacios);
 	//ImprimirTablero(tablero1);
@@ -224,10 +238,6 @@ int main(){
 	        swapTableros (&tablero1, &tablero2, &tableroAux);
 			pongoFicha (&tablero1,casVacios);
 			hiceUndo=0;
-
-			printf("\n");
-
-			ImprimirTablero (tablero1);
 		}else{//error
 			printf("Por favor ingrese un movimiento valido!!\n");
 		}
