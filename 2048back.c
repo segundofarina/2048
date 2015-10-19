@@ -238,6 +238,9 @@ int main(){
 	        swapTableros (&tablero1, &tablero2, &tableroAux);
 			pongoFicha (&tablero1,casVacios);
 			hiceUndo=0;
+            printf("\n");
+
+            ImprimirTablero (tablero1);
 		}else{//error
 			printf("Por favor ingrese un movimiento valido!!\n");
 		}
