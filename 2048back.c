@@ -29,9 +29,10 @@ typedef struct{
 void ImprimirTablero( tablero tablero);
 void Imprimecasvacios (casVacios casVacios);
 
-void creoTablero (tablero * tablero, int dim){
+void creoTablero (tablero * tablero, int dim, int undos){
     int i;
     tablero->puntaje=0;
+    tablero->undos=undos;
     tablero->dim=dim;
     tablero->matriz=(int **) calloc(tablero->dim,sizeof(int*));
     for(i=0;i<tablero->dim; i++){
@@ -185,31 +186,48 @@ void swapTableros (tablero * tablero1, tablero * tablero2, tablero * aux){/*no h
     *tablero2=*aux;
 }
 
+void undo(tablero * tablero1, tablero * tablero2, tablero * aux){
+	swapTableros(tablero1, tablero2, aux);
+	(tablero1->undos)--;
+	(tablero2->undos)--;
+}
 
 int main(){
 	srand(time(NULL));
-	int direccion;
+	int direccion,hiceUnd;
 	tablero tablero1;
 	tablero tablero2;
 	tablero tableroAux;
 	casVacios casVacios;
-	creoTablero (&tablero1,4);
-	creoTablero (&tablero2,4);
+	creoTablero (&tablero1,4,3);
+	creoTablero (&tablero2,4,3);
 	creoCasvacios (&casVacios, 4);
-    Imprimecasvacios(casVacios);
-	ImprimirTablero(tablero1);
+    //Imprimecasvacios(casVacios);
+	//ImprimirTablero(tablero1);
 	pongoFicha (&tablero1,casVacios);
 	ImprimirTablero (tablero1);
 	
-	while((direccion=getint("Para que lado moves??\n"))!=5){
-		muevoTablero(direccion,tablero1,&tablero2,&casVacios);
-        swapTableros (&tablero1, &tablero2, &tableroAux);
-		pongoFicha (&tablero1,casVacios);
+	while((direccion=getint("Para que lado moves??\n"))!=6){
+		if(direccion==5){//hago undo
+			if(tablero1.undos>0){
+				undo (&tablero2, &tablero1, &tableroAux);
 
-		printf("\n");
+				printf("\n");
+				ImprimirTablero (tablero1);
+			}else{
+				printf("No posees mas undos para realizar\n");
+			}
+		}else if(direccion==1 || direccion==2 || direccion==3 || direccion==4){//si es movimiento valido
+			muevoTablero(direccion,tablero1,&tablero2,&casVacios);
+	        swapTableros (&tablero1, &tablero2, &tableroAux);
+			pongoFicha (&tablero1,casVacios);
 
-		ImprimirTablero (tablero1);
-		
+			printf("\n");
+
+			ImprimirTablero (tablero1);
+		}else{//error
+			printf("Por favor ingrese un movimiento valido!!\n");
+		}
 
 	}
 
@@ -220,6 +238,7 @@ int main(){
 void ImprimirTablero( tablero tablero){
     int i,j;
     printf("PUNTAJE:%d\n",tablero.puntaje);
+    printf("UNDOS:%d\n",tablero.undos);
     for(i=0;i<tablero.dim;i++){
         for(j=0;j<tablero.dim;j++){
             printf("%d\t", tablero.matriz[i][j]);
