@@ -179,12 +179,10 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vac
 
     }
 }
-void swapTableros (tablero * tablero1, tablero * tablero2){
-    tablero * aux;
-    aux->matriz=tablero1->matriz;
-    tablero1->matriz=tablero2->matriz;
-    tablero2->matriz=aux->matriz;
-    return ;
+void swapTableros (tablero * tablero1, tablero * tablero2, tablero * aux){/*no hace falta rotarlos solo los igualo*/
+    *aux=*tablero1;
+    *tablero1=*tablero2;
+    *tablero2=*aux;
 }
 
 
@@ -193,7 +191,7 @@ int main(){
 	int direccion;
 	tablero tablero1;
 	tablero tablero2;
-	tablero aux;
+	tablero tableroAux;
 	casVacios casVacios;
 	creoTablero (&tablero1,4);
 	creoTablero (&tablero2,4);
@@ -202,36 +200,18 @@ int main(){
 	ImprimirTablero(tablero1);
 	pongoFicha (&tablero1,casVacios);
 	ImprimirTablero (tablero1);
-	/*for (int i = 0; i < 10; ++i)
-	{	
-		direccion=getint("Para que lado moves??\n");
-		muevoTablero(direccion,tablero1,&tablero2,&casVacios);
-		aux.matriz=tablero1.matriz;
-		tablero1.matriz=tablero2.matriz;
-		tablero2.matriz=aux.matriz;
-		pongoFicha (&tablero1,casVacios);
-		ImprimirTablero (tablero1);
-	}*/
+	
 	while((direccion=getint("Para que lado moves??\n"))!=5){
 		muevoTablero(direccion,tablero1,&tablero2,&casVacios);
-        //swapTableros (&tablero1, &tablero2);
-		/*aux.matriz=tablero1.matriz;
-		tablero1.matriz=tablero2.matriz;
-		tablero2.matriz=aux.matriz;
-        /*aux.puntaje=tablero1.puntaje;
-        tablero1.puntaje=tablero2.puntaje;
-        tablero2.puntaje=aux.puntaje;*/
-        aux=tablero1;
-        tablero1=tablero2;
-        tablero2=aux;
+        swapTableros (&tablero1, &tablero2, &tableroAux);
 		pongoFicha (&tablero1,casVacios);
+
 		printf("\n");
 
 		ImprimirTablero (tablero1);
+		
 
 	}
-
-
 
 	return 0;
 
