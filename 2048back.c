@@ -194,7 +194,7 @@ void undo(tablero * tablero1, tablero * tablero2, tablero * aux){
 
 int main(){
 	srand(time(NULL));
-	int direccion,hiceUnd;
+	int direccion,hiceUndo=1;
 	tablero tablero1;
 	tablero tablero2;
 	tablero tableroAux;
@@ -209,18 +209,21 @@ int main(){
 	
 	while((direccion=getint("Para que lado moves??\n"))!=6){
 		if(direccion==5){//hago undo
-			if(tablero1.undos>0){
+			if(tablero1.undos>0 && !hiceUndo){
 				undo (&tablero2, &tablero1, &tableroAux);
+				hiceUndo=1;
 
 				printf("\n");
 				ImprimirTablero (tablero1);
 			}else{
-				printf("No posees mas undos para realizar\n");
+				hiceUndo=0;
+				printf("No puedes realizar undo\n");
 			}
 		}else if(direccion==1 || direccion==2 || direccion==3 || direccion==4){//si es movimiento valido
 			muevoTablero(direccion,tablero1,&tablero2,&casVacios);
 	        swapTableros (&tablero1, &tablero2, &tableroAux);
 			pongoFicha (&tablero1,casVacios);
+			hiceUndo=0;
 
 			printf("\n");
 
