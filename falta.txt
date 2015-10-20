@@ -1,5 +1,3 @@
-verificar en sumoLineas cuando llego al numero ganador
-
 verificar si hay movimientos validos
 
 funciones de save
