@@ -56,7 +56,6 @@ int dificultad(){
 }
 int menu(){
 	int resp;
-	//printf("ELIJA UNA OPCION:\n");
 	printf("1-Juego nuevo\n");
 	printf("2-Recuperar un juego guardado\n");
 	printf("3-Salir\n");
@@ -76,7 +75,13 @@ void ImprimirTablero( tablero tablero){
     printf("PUNTAJE:%d\n",tablero.puntaje);
     printf("UNDOS:%d\n",tablero.undos);
     for(i=0;i<tablero.dim;i++){
-    	printf("------------------------------------------\n");
+    	if(tablero.dim==4){
+    		printf("---------------------\n");
+    	}else if(tablero.dim==6){
+    		printf("-------------------------------\n");
+    	}else{
+    		printf("-----------------------------------------\n");
+    	}
         for(j=0;j<tablero.dim;j++){
             if(tablero.matriz[i][j]!=0){
             	printf("|%4d", tablero.matriz[i][j]);
@@ -86,7 +91,13 @@ void ImprimirTablero( tablero tablero){
         }
         printf("|\n");
     }
-    printf("------------------------------------------\n");
+    if(tablero.dim==4){
+		printf("---------------------\n");
+	}else if(tablero.dim==6){
+		printf("-------------------------------\n");
+	}else{
+		printf("-----------------------------------------\n");
+	}
     printf("\n");
 }
 
@@ -114,37 +125,29 @@ void getAccion(char comando[]){
 
 int pedirJugada(){
 	char comando[MAX_LENGTH];
-	printf("Ingrese un comando:\n");
-	getAccion(comando);
-	int resp;
-	if(!strcmp(comando,"a")){
-		resp=IZQUIERDA;
-	}else if(!strcmp(comando,"w")){
-		resp=ARRIBA;
-	}else if(!strcmp(comando,"d")){
-		resp=DERECHA;
-	}else if(!strcmp(comando,"s")){
-		resp=ABAJO;
-	}else if(!strcmp(comando,"undo")){
-		resp=UNDO;
-	}else if(!strcmp(comando,"quit")){
-		resp=QUIT;//modificar
-		/*printf("Desea guardar la partida?(y/n)\n");
+	int resp=-1;
+	while(resp==-1){
+		printf("Ingrese un comando:\n");
 		getAccion(comando);
-		if(!strcmp(comando,"y"){
-			//guardo la partida
-		}else if(){
-
+		if(!strcmp(comando,"a")){
+			resp=IZQUIERDA;
+		}else if(!strcmp(comando,"w")){
+			resp=ARRIBA;
+		}else if(!strcmp(comando,"d")){
+			resp=DERECHA;
+		}else if(!strcmp(comando,"s")){
+			resp=ABAJO;
+		}else if(!strcmp(comando,"undo")){
+			resp=UNDO;
+		}else if(!strcmp(comando,"quit")){
+			resp=QUIT;
+		}else if(!strcmp(comando,"save")){//modificar
+			resp=SAVE;
 		}else{
-
-		}*/
-	}else if(!strcmp(comando,"save")){
-		resp=SAVE;
-	}else{
-		resp=-1;
+			resp=-1;
+		}
 	}
 	return resp;
-
 }
 
 int main(){
@@ -152,7 +155,7 @@ int main(){
 	int resp,accion,jugada;
 	presentacion();
 	resp=menu();
-	int direccion,hiceUndo=1,gane=0,perdi=0;;
+	int direccion,hiceUndo=1,gane=0,perdi=0;
 	tablero tablero1, tablero2, tableroAux;
 	casVacios casVacios;
 	int movimientos[4];
@@ -171,21 +174,22 @@ int main(){
 		break;
 
 	}
-	do{
-		while((accion=pedirJugada())==-1);
+
+	while(!gane && !perdi && (accion=pedirJugada())!=QUIT && accion!=SAVE){
 		jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion);
 		if(jugada==0){
 		    ImprimirTablero(tablero1);
 		}else{
 			ImprimirError(jugada);
 		}
-
-	}while(!gane && !perdi && accion!=QUIT);
+	}	
 	
 	if(gane){
 		printf("\n\n********** Felicitaciones has ganado!!! **********\n\n");
 	}else if (perdi){
         printf("\n\n********** Lo lamento has perdido! **********\n\n");
+    }else if(accion==QUIT){
+
     }else{
     	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
     }
