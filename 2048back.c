@@ -20,6 +20,7 @@ typedef struct {
     int dim;
     int undos;
     int puntaje;
+    int numGanador;
 } tablero;
 typedef struct{
     int ** matriz;
@@ -33,6 +34,7 @@ void creoTablero (tablero * tablero, int dim, int undos){
     int i;
     tablero->puntaje=0;
     tablero->undos=undos;
+    tablero->numGanador=2048;
     tablero->dim=dim;
     tablero->matriz=(int **) calloc(tablero->dim,sizeof(int*));
     for(i=0;i<tablero->dim; i++){
@@ -86,9 +88,9 @@ void pongoFicha(tablero * nuevo, casVacios vacios){//agrego una nueva ficha alea
 }
 
 
-void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios * vacios){
+int sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios * vacios){
 
-    int i,j,k=I.inicio, h=J.inicio, sume=0;
+    int i,j,k=I.inicio, h=J.inicio, sume=0, gane=0;
 
     for( i=I.inicio, j=J.inicio; i!=I.final && j!=J.final; i+=I.incremento, j+=J.incremento ){//recorro la fila o la columna dependiendo de los paramentros
         
@@ -105,6 +107,11 @@ void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios 
 
                 /*sumo puntaje*/
                 nueva->puntaje+=nueva->matriz[k-I.incremento][h-J.incremento];
+
+                /*verifico si gane*/
+                if(nueva->matriz[k-I.incremento][h-J.incremento]==nueva->numGanador){
+                	gane=1;
+                }
 
 
             }else{
@@ -123,6 +130,7 @@ void sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios 
         vacios->matriz[vacios->num][0]=k;
         vacios->matriz[(vacios->num)++][1]=h;
     }
+    return gane;
 }
 
 void descifroMovimiento (int direccion, movimiento * I, movimiento * J,int dim){
@@ -164,9 +172,10 @@ void descifroMovimiento (int direccion, movimiento * I, movimiento * J,int dim){
 }
 
 
-void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vacios){
+int muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vacios){
     /*Creo los dos sentidos de movimiento y recorro la matriz llamando a la funcion que suma las filas en sentido opuesto a la direccion*/
     movimiento I,J;
+    int gane=0;
 
     descifroMovimiento(direccion,&I,&J,viejo.dim);
 
@@ -176,9 +185,12 @@ void muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vac
 
     for ( ; I.inicio!=I.final && J.inicio!=J.final; I.inicio+=abs(J.incremento), J.inicio+=abs(I.incremento) )
     {
-        sumoFila(I,J,viejo,nuevo,vacios);
+        if(sumoFila(I,J,viejo,nuevo,vacios)){
+        	gane=1;
+        }
 
     }
+    return gane;
 }
 void swapTableros (tablero * tablero1, tablero * tablero2, tablero * aux){/*no hace falta rotarlos solo los igualo*/
     *aux=*tablero1;
@@ -207,7 +219,7 @@ int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimie
 
 int main(){
 	srand(time(NULL));
-	int direccion,hiceUndo=1;
+	int direccion,hiceUndo=1,gane=0;
 	tablero tablero1;
 	tablero tablero2;
 	tablero tableroAux;
@@ -221,7 +233,7 @@ int main(){
 	pongoFicha (&tablero1,casVacios);
 	ImprimirTablero (tablero1);
 	
-	while((direccion=getint("Para que lado moves??\n"))!=6){
+	while(!gane && (direccion=getint("Para que lado moves??\n"))!=6){
 		if(direccion==5){//hago undo
 			if(tablero1.undos>0 && !hiceUndo){
 				undo (&tablero2, &tablero1, &tableroAux);
@@ -234,7 +246,7 @@ int main(){
 				printf("No puedes realizar undo\n");
 			}
 		}else if(direccion==1 || direccion==2 || direccion==3 || direccion==4){//si es movimiento valido
-			muevoTablero(direccion,tablero1,&tablero2,&casVacios);
+			/*muevoTablero(direccion,tablero1,&tablero2,&casVacios);
             if (verificoMovimiento(tablero1,tablero2)){
                 swapTableros (&tablero1, &tablero2, &tableroAux);
                 pongoFicha (&tablero1,casVacios);
@@ -245,13 +257,32 @@ int main(){
                 ImprimirTablero(tableroAux);
                 tablero2=tableroAux;
                 hiceUndo=0;
+            }*/
+        	gane = muevoTablero(direccion,tablero1,&tableroAux,&casVacios);
+        	printf("**%d\n", gane);
+            if (verificoMovimiento(tablero1,tableroAux)){
+            	tablero2=tableroAux;
+                swapTableros (&tablero1, &tablero2, &tableroAux);
+                pongoFicha (&tablero1,casVacios);
+                hiceUndo=0;
+                printf("\n");
+                ImprimirTablero (tablero1);
+            }
+            else {
+                //ImprimirTablero(tableroAux);
+                //tablero2=tableroAux;
+                hiceUndo=0;
+                printf("Mov no valido!\n");
             }
 
-            ImprimirTablero (tablero1);
+            //ImprimirTablero (tablero1);
 		}else{//error
 			printf("Por favor ingrese un movimiento valido!!\n");
 		}
 
+	}
+	if(gane){
+		printf("\n\n**********Felicitaciones has ganado!!!**********\n\n");
 	}
 
 	return 0;
