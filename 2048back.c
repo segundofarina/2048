@@ -29,6 +29,7 @@ typedef struct{
 } casVacios;
 void ImprimirTablero( tablero tablero);
 void Imprimecasvacios (casVacios casVacios);
+void ImprimeMovimientos (int movimientos[]);
 
 void creoTablero (tablero * tablero, int dim, int undos){
     int i;
@@ -204,6 +205,7 @@ void undo(tablero * tablero1, tablero * tablero2, tablero * aux){
 	(tablero2->undos)--;
 }
 
+/*
 int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimiento es valido 0 si es invalido
     int i,j,valido=0;
     for(i=0; i<viejo.dim && !valido; i++){
@@ -214,26 +216,67 @@ int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimie
         }
     }
     return valido;
+}*/
+
+void movimientosValidos(tablero tablero1, int movimientos[]){
+	int i,j;
+	movimientos[0]=0;
+	movimientos[1]=0;
+	movimientos[2]=0;
+	movimientos[3]=0;
+	for(i=0;i<tablero1.dim && (movimientos[0]==0 || movimientos[1]==0 || movimientos[2]==0 || movimientos[3]==0);i++){
+		for(j=0;j<tablero1.dim && (movimientos[0]==0 || movimientos[1]==0 || movimientos[2]==0 || movimientos[3]==0);j++){
+			if(tablero1.matriz[i][j]!=0){//busco casillero que no es 0
+				if(j!=0 && tablero1.matriz[i][j-1]==0){//si tengo 0 a la izquierda me puedo mover para la izquierda
+					movimientos[0]=1;
+				}
+				if(i!=0 && tablero1.matriz[i-1][j]==0){//si tengo 0 arriba me puedo mover para arriba
+					movimientos[1]=1;
+				}
+				if(j!=tablero1.dim-1 && tablero1.matriz[i][j+1]==0){//si tengo 0 a la derecha me puedo mover para la derecha
+					movimientos[2]=1;
+				}
+				if(i!=tablero1.dim-1 && tablero1.matriz[i+1][j]==0){//si tengo un 0 abajo me puedo mover para abajo
+					movimientos[3]=1;
+				}
+				if(j!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i][j+1]){//numeros pegados en fila
+					movimientos[0]=movimientos[2]=1;
+				}else if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
+					movimientos[1]=movimientos[3]=1;
+				}
+			}
+		}
+	}
 }
 
+int fperdi(int movimientos[]){
+	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0){
+		return 1;
+	}else{
+		return 0;
+	}
+}
 
 int main(){
 	srand(time(NULL));
-	int direccion,hiceUndo=1,gane=0;
+	int direccion,hiceUndo=1,gane=0,perdi=0;;
 	tablero tablero1;
 	tablero tablero2;
 	tablero tableroAux;
 	casVacios casVacios;
+	int movimientos[4];
 	creoTablero (&tablero1,4,3);
 	creoTablero (&tablero2,4,3);
-    creoTablero (&tableroAux,4,3);
+    //creoTablero (&tableroAux,4,3);
 	creoCasvacios (&casVacios, 4);
     //Imprimecasvacios(casVacios);
 	//ImprimirTablero(tablero1);
 	pongoFicha (&tablero1,casVacios);
+	movimientosValidos(tablero1, movimientos);
+	ImprimeMovimientos(movimientos);
 	ImprimirTablero (tablero1);
 	
-	while(!gane && (direccion=getint("Para que lado moves??\n"))!=6){
+	while(!gane && !perdi && (direccion=getint("Para que lado moves??\n"))!=6){
 		if(direccion==5){//hago undo
 			if(tablero1.undos>0 && !hiceUndo){
 				undo (&tablero2, &tablero1, &tableroAux);
@@ -258,6 +301,25 @@ int main(){
                 tablero2=tableroAux;
                 hiceUndo=0;
             }*/
+
+        	
+            if(movimientos[direccion-1]!=0){
+            	printf("***\n");
+            	ImprimeMovimientos(movimientos);
+            	printf("***\n");
+            	gane = muevoTablero(direccion,tablero1,&tablero2,&casVacios);
+            	swapTableros (&tablero1, &tablero2, &tableroAux);
+                pongoFicha (&tablero1,casVacios);
+                hiceUndo=0;
+                movimientosValidos(tablero1, movimientos);
+                perdi=fperdi(movimientos);
+                printf("\n");
+                ImprimirTablero (tablero1);
+            }else{
+				printf("Movimiento no valido!\n");
+            }
+
+/*
         	gane = muevoTablero(direccion,tablero1,&tableroAux,&casVacios);
         	printf("**%d\n", gane);
             if (verificoMovimiento(tablero1,tableroAux)){
@@ -274,7 +336,7 @@ int main(){
                 hiceUndo=0;
                 printf("Mov no valido!\n");
             }
-
+*/
             //ImprimirTablero (tablero1);
 		}else{//error
 			printf("Por favor ingrese un movimiento valido!!\n");
@@ -308,6 +370,16 @@ void Imprimecasvacios (casVacios casVacios){
 	{
 		printf("%d\t%d\n",casVacios.matriz[i][0], casVacios.matriz[i][1] );
 	}
+	
+
+}
+
+void ImprimeMovimientos (int movimientos[]){
+	for (int i = 0; i < 4; i++)
+	{
+		printf("%d\t",movimientos[i]);
+	}
+	printf("\n");
 	
 
 }
