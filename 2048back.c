@@ -2,11 +2,30 @@
 #include <stdlib.h>
 #include <time.h>
 #include "getnum.h"
-
+/*
 #define IZQUIERDA 1
 #define ARRIBA 2
 #define DERECHA 3
 #define ABAJO 4
+#define FACIL 4
+#define INTERMEDIO 5
+#define DIFICIL 6
+
+#define ERR_UNDO -100
+#define ERR_MOV -99*/
+#define MAX_LENGTH 41
+#define IZQUIERDA 1
+#define ARRIBA 2
+#define DERECHA 3
+#define ABAJO 4
+#define SAVE 7
+#define QUIT 6
+#define UNDO 5
+#define FACIL 4
+#define INTERMEDIO 5
+#define DIFICIL 6
+#define ERR_UNDO -100
+#define ERR_MOV -99
 
 typedef struct{
     int inicio;
@@ -16,7 +35,6 @@ typedef struct{
 } movimiento;
 typedef struct {
     int ** matriz;
-    //int matriz[4][4];
     int dim;
     int undos;
     int puntaje;
@@ -24,18 +42,18 @@ typedef struct {
 } tablero;
 typedef struct{
     int ** matriz;
-    //int matriz[16][2];
     int num;
 } casVacios;
+/*
 void ImprimirTablero( tablero tablero);
 void Imprimecasvacios (casVacios casVacios);
-void ImprimeMovimientos (int movimientos[]);
+void ImprimeMovimientos (int movimientos[]);*/
 
-void creoTablero (tablero * tablero, int dim, int undos){
+void creoTablero (tablero * tablero, int dim, int undos, int ganador){
     int i;
     tablero->puntaje=0;
     tablero->undos=undos;
-    tablero->numGanador=2048;
+    tablero->numGanador=ganador;
     tablero->dim=dim;
     tablero->matriz=(int **) calloc(tablero->dim,sizeof(int*));
     for(i=0;i<tablero->dim; i++){
@@ -205,19 +223,6 @@ void undo(tablero * tablero1, tablero * tablero2, tablero * aux){
 	(tablero2->undos)--;
 }
 
-/*
-int verificoMovimiento(tablero viejo, tablero nuevo){ //Devuelve 1 si el movimiento es valido 0 si es invalido
-    int i,j,valido=0;
-    for(i=0; i<viejo.dim && !valido; i++){
-        for (j=0; j<viejo.dim && !valido; j++){
-            if (viejo.matriz[i][j]!=nuevo.matriz[i][j]){
-                valido=1;
-            }
-        }
-    }
-    return valido;
-}*/
-
 void movimientosValidos(tablero tablero1, int movimientos[]){
 	int i,j;
 	movimientos[0]=0;
@@ -249,38 +254,90 @@ void movimientosValidos(tablero tablero1, int movimientos[]){
 	}
 }
 
-int fperdi(int movimientos[]){
-	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0){
-		return 1;
+int fperdi(int movimientos[], tablero tablero){
+	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0 && tablero.undos==0){
+        return 1;
 	}else{
 		return 0;
 	}
 }
 
+void inicializo(tablero * tablero1, tablero * tablero2, casVacios * casVacios, int dificultad, int movimientos[]){
+    switch(dificultad){
+        case FACIL:
+            creoTablero(tablero1,8,8,1024);
+            creoTablero(tablero2,8,8,1024);
+            creoCasvacios(casVacios,8);
+            break;
+        case INTERMEDIO:
+            creoTablero(tablero1,6,4,2048);
+            creoTablero(tablero2,6,4,2048);
+            creoCasvacios(casVacios,6);
+            break;
+        case DIFICIL:
+            creoTablero(tablero1,4,3,2048);
+            creoTablero(tablero2,4,3,2048);
+            creoCasvacios(casVacios,4);
+            break;
+    }
+    pongoFicha (tablero1,*casVacios);
+
+    movimientosValidos(*tablero1, movimientos);
+}
+
+int jugar(tablero * tablero1,tablero * tablero2, tablero * tableroAux,casVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
+    int error=0;
+        if(accion==5){//hago undo
+            if(tablero1->undos>0 && !*hiceUndo){
+                undo (tablero2, tablero1, tableroAux);
+                *hiceUndo=1;
+                movimientosValidos(*tablero1, movimientos);
+
+                //printf("\n");
+                //ImprimirTablero (tablero1); Devuelve 0
+            }else{
+                *hiceUndo=0;
+                error=ERR_UNDO;
+                //printf("No puedes realizar undo\n");
+            }
+        }else if(accion==1 || accion==2 || accion==3 || accion==4){//si es movimiento valido
+            if(movimientos[accion-1]!=0){
+                *gane = muevoTablero(accion,*tablero1,tablero2,casVacios);
+                swapTableros (tablero1, tablero2, tableroAux);
+                pongoFicha (tablero1,*casVacios);
+                *hiceUndo=0;
+                movimientosValidos(*tablero1, movimientos);
+                *perdi=fperdi(movimientos, *tablero1);
+                //printf("\n");
+                //ImprimirTablero (tablero1);
+            }else{
+                error=ERR_MOV;
+                //printf("Movimiento no valido!\n");
+            }
+
+        }
+
+    return error;
+
+}
+/*
 int main(){
 	srand(time(NULL));
-	int direccion,hiceUndo=1,gane=0,perdi=0;;
+	int accion,hiceUndo=1,gane=0,perdi=0;;
 	tablero tablero1;
 	tablero tablero2;
 	tablero tableroAux;
 	casVacios casVacios;
 	int movimientos[4];
-	creoTablero (&tablero1,4,3);
-	creoTablero (&tablero2,4,3);
-    //creoTablero (&tableroAux,4,3);
-	creoCasvacios (&casVacios, 4);
-    //Imprimecasvacios(casVacios);
-	//ImprimirTablero(tablero1);
-	pongoFicha (&tablero1,casVacios);
-	movimientosValidos(tablero1, movimientos);
-	ImprimeMovimientos(movimientos);
+    inicializo(&tablero1,&tablero2,&casVacios,DIFICIL,movimientos);
 	ImprimirTablero (tablero1);
 	
-	while(!gane && !perdi && (direccion=getint("Para que lado moves??\n"))!=6){
-		if(direccion==5){//hago undo
+	while(!gane && !perdi && (accion=getint("Ingrese un movimiento\n"))!=6){
+		/*if(direccion==5){//hago undo
 			if(tablero1.undos>0 && !hiceUndo){
 				undo (&tablero2, &tablero1, &tableroAux);
 				hiceUndo=1;
+                movimientosValidos(tablero1, movimientos);
 
 				printf("\n");
 				ImprimirTablero (tablero1);
@@ -289,64 +346,35 @@ int main(){
 				printf("No puedes realizar undo\n");
 			}
 		}else if(direccion==1 || direccion==2 || direccion==3 || direccion==4){//si es movimiento valido
-			/*muevoTablero(direccion,tablero1,&tablero2,&casVacios);
-            if (verificoMovimiento(tablero1,tablero2)){
-                swapTableros (&tablero1, &tablero2, &tableroAux);
-                pongoFicha (&tablero1,casVacios);
-                hiceUndo=0;
-                printf("\n");
-            }
-            else {
-                ImprimirTablero(tableroAux);
-                tablero2=tableroAux;
-                hiceUndo=0;
-            }*/
-
-        	
-            if(movimientos[direccion-1]!=0){
-            	printf("***\n");
-            	ImprimeMovimientos(movimientos);
-            	printf("***\n");
+			if(movimientos[direccion-1]!=0){
             	gane = muevoTablero(direccion,tablero1,&tablero2,&casVacios);
             	swapTableros (&tablero1, &tablero2, &tableroAux);
                 pongoFicha (&tablero1,casVacios);
                 hiceUndo=0;
                 movimientosValidos(tablero1, movimientos);
-                perdi=fperdi(movimientos);
+                perdi=fperdi(movimientos, tablero1);
                 printf("\n");
                 ImprimirTablero (tablero1);
             }else{
 				printf("Movimiento no valido!\n");
             }
 
-/*
-        	gane = muevoTablero(direccion,tablero1,&tableroAux,&casVacios);
-        	printf("**%d\n", gane);
-            if (verificoMovimiento(tablero1,tableroAux)){
-            	tablero2=tableroAux;
-                swapTableros (&tablero1, &tablero2, &tableroAux);
-                pongoFicha (&tablero1,casVacios);
-                hiceUndo=0;
-                printf("\n");
-                ImprimirTablero (tablero1);
-            }
-            else {
-                //ImprimirTablero(tableroAux);
-                //tablero2=tableroAux;
-                hiceUndo=0;
-                printf("Mov no valido!\n");
-            }
-*/
-            //ImprimirTablero (tablero1);
 		}else{//error
 			printf("Por favor ingrese un movimiento valido!!\n");
 		}
+*//*******
+ if(!jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion)){
+    ImprimirTablero(tablero1);
+ }
+
 
 	}
 	if(gane){
 		printf("\n\n**********Felicitaciones has ganado!!!**********\n\n");
 	}
-
+    if (perdi){
+        printf("Lo lamento has perdido!\n");
+    }
 	return 0;
 
 }
@@ -382,4 +410,4 @@ void ImprimeMovimientos (int movimientos[]){
 	printf("\n");
 	
 
-}
+}*/
