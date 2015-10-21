@@ -17,27 +17,6 @@ void movimientosValidos(tablero tablero1, int movimientos[]){
 	movimientos[3]=0;
 	for(i=0;i<tablero1.dim && (movimientos[0]==0 || movimientos[1]==0 || movimientos[2]==0 || movimientos[3]==0);i++){
 		for(j=0;j<tablero1.dim && (movimientos[0]==0 || movimientos[1]==0 || movimientos[2]==0 || movimientos[3]==0);j++){
-			//si hay un 0 en un borde se puede mover en la direccion del borde, para arriba y para abajo
-			/*if(i==0 && tablero1.matriz[i][j]==0){//borde derecho
-				movimientos[0]=movimientos[1]=movimientos[3]=1;
-			}else if(j==tablero1.dim-1 && tablero1.matriz[i][j]==0){//borde izquierdo
-				movimientos[1]=movimientos[2]=movimientos[3]=1;
-			}else if(j==0 && tablero1.matriz[i][j]==0){//borde superior
-				movimientos[0]=movimientos[1]=movimientos[2]=1;
-			}else if(i==tablero1.dim-1 && tablero1.matriz[i][j]==0){//borde inferior
-				movimientos[0]=movimientos[2]=movimientos[3]=1;
-			}else if(tablero1.matriz[i][j]==0){//si hay un 0 y no es borde se puede mover en cualquier direccion
-				movimientos[0]=movimientos[1]=movimientos[2]=movimientos[3]=1;
-			}//si hay dos numeros pegados iguales se puede mover en fila o columna dependiendo de como estan pegados
-			else if(j!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i][j+1]){//numeros pegados en fila
-				movimientos[0]=movimientos[2]=1;
-			}else if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
-				movimientos[1]=movimientos[3]=1;
-			}*/
-
-
-
-			
 			
 			//suma de numeros
 			if(tablero1.matriz[i][j]!=0){//busco casillero que no es 0
@@ -55,7 +34,8 @@ void movimientosValidos(tablero tablero1, int movimientos[]){
 				}
 				if(j!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i][j+1]){//numeros pegados en fila
 					movimientos[0]=movimientos[2]=1;printf("aca4\n");
-				}else if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
+				}
+				if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
 					movimientos[1]=movimientos[3]=1;printf("aca5\n");
 				}
 			}
@@ -85,7 +65,7 @@ void ImprimeMovimientos (int movimientos[]){
 }
 
 int main(){
-	tablero tablero1={ { {1,2,4,5},{2,7,8,9},{10,11,12,0},{14,15,16,17} }, 4 };
+	tablero tablero1={ { {0,0,16,256},{0,0,4,128},{2,2,16,32},{2,4,8,16} }, 4 };
 
 	int movimientos[4];
 	ImprimirTablero(tablero1);

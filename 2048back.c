@@ -246,7 +246,8 @@ void movimientosValidos(sTablero tablero1, int movimientos[]){
 				}
 				if(j!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i][j+1]){//numeros pegados en fila
 					movimientos[0]=movimientos[2]=1;
-				}else if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
+				}
+				if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
 					movimientos[1]=movimientos[3]=1;
 				}
 			}
