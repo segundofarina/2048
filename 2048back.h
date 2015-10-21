@@ -46,9 +46,9 @@ int randInt(int inicio, int final);
 
 int nuevaFicha();
 
-void buscoCasillero(sCasVacios vacios, int * posI, int *posJ);
+int buscoCasillero(sCasVacios vacios, int * posI, int *posJ);
 
-void pongoFicha(sTablero * nuevo, sCasVacios vacios);
+void pongoFicha(sTablero * nuevo, sCasVacios * vacios);
 
 int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVacios * vacios);
 

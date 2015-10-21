@@ -88,17 +88,25 @@ int nuevaFicha(){//aleatorio 2 o 4
 	}
 }
 
-void buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
+int buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
 	int alearorio=randInt(0,(vacios.num)-1);
 
 	*posI=vacios.matriz[alearorio][0];//devuelvo posicion elejida i,j
 	*posJ=vacios.matriz[alearorio][1];
+
+	return alearorio;
 }
 
-void pongoFicha(sTablero * nuevo, sCasVacios vacios){//agrego una nueva ficha aleatoria al tablero
-	int i,j,ficha=nuevaFicha();
-	buscoCasillero(vacios,&i,&j);
+void pongoFicha(sTablero * nuevo, sCasVacios * vacios){//agrego una nueva ficha aleatoria al tablero
+	int i,j,pos,ficha=nuevaFicha();
+	pos=buscoCasillero(*vacios,&i,&j);
 	nuevo->matriz[i][j]=ficha;
+	//borro posicion vacia usada
+	(vacios->num)--;
+	for(;pos<(vacios->num);pos++){
+		vacios->matriz[pos][0]=vacios->matriz[pos+1][0];
+		vacios->matriz[pos][1]=vacios->matriz[pos+1][1];
+	}
 }
 
 
@@ -275,7 +283,9 @@ void inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios
             creoCasvacios(casVacios,4);
             break;
     }
-    pongoFicha (tablero1,*casVacios);
+    pongoFicha (tablero1,casVacios);//agrego primer ficha
+    //modifico casVacios
+    pongoFicha (tablero1,casVacios);//agrego segunda ficha
 
     movimientosValidos(*tablero1, movimientos);
 }
@@ -295,7 +305,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
             if(movimientos[accion-1]!=0){
                 *gane = muevoTablero(accion,*tablero1,tablero2,casVacios);
                 swapTableros (tablero1, tablero2, tableroAux);
-                pongoFicha (tablero1,*casVacios);
+                pongoFicha (tablero1,casVacios);
                 *hiceUndo=0;
                 movimientosValidos(*tablero1, movimientos);
                 *perdi=fperdi(movimientos, *tablero1);
