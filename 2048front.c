@@ -54,9 +54,11 @@ int main(){
 	}	
 	
 	if(gane){
-		printf("\n\n********** Felicitaciones has ganado!!! **********\n\n");
+		printf("\n\n********** Felicitaciones has ganado!!! **********\n");
+		printf("**********     Tu puntuacion fue: %d    **********\n\n",tablero1.puntaje);
 	}else if (perdi){
-        printf("\n\n********** Lo lamento has perdido! **********\n\n");
+        printf("\n\n********** Lo lamento has perdido! **********\n");
+        printf("**********  Tu puntuacion fue: %d  **********\n\n",tablero1.puntaje);
     }else if(accion==QUIT){
 
     }else if(accion==SAVE){
