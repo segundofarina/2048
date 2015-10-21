@@ -1,25 +1,29 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/*#include <stdio.h>
+#include <stdlib.h>*/
+#include <string.h>/*
 #include <time.h>
 #include "getnum.h"
 
+*/
+
+#include "2048back.h"
 
 #define MAX_LENGTH 41
+/*
 #define IZQUIERDA 1
 #define ARRIBA 2
 #define DERECHA 3
-#define ABAJO 4
+#define ABAJO 4*/
 #define SAVE 7
 #define QUIT 6
-#define UNDO 5
+#define UNDO 5/*
 #define FACIL 4
 #define INTERMEDIO 5
 #define DIFICIL 6
 #define ERR_UNDO -100
 #define ERR_MOV -99
 
-#include "2048back.c"
+#include "2048back.c"*/
 
 
 void presentacion();

@@ -1,8 +1,8 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "getnum.h"
-/*
+
 #define IZQUIERDA 1
 #define ARRIBA 2
 #define DERECHA 3
@@ -13,7 +13,7 @@
 
 #define ERR_UNDO -100
 #define ERR_MOV -99*/
-#define MAX_LENGTH 41
+/*#define MAX_LENGTH 41
 #define IZQUIERDA 1
 #define ARRIBA 2
 #define DERECHA 3
@@ -25,8 +25,8 @@
 #define INTERMEDIO 5
 #define DIFICIL 6
 #define ERR_UNDO -100
-#define ERR_MOV -99
-
+#define ERR_MOV -99*/
+/*
 typedef struct{
     int inicio;
     int final;
@@ -43,11 +43,9 @@ typedef struct {
 typedef struct{
     int ** matriz;
     int num;
-} sCasVacios;
-/*
-void ImprimirTablero( tablero tablero);
-void Imprimecasvacios (casVacios casVacios);
-void ImprimeMovimientos (int movimientos[]);*/
+} sCasVacios;*/
+
+#include "2048back.h"
 
 void creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     int i;
@@ -79,11 +77,9 @@ int randInt(int inicio, int final){//aleatorio entre inicio y final
 	int aux;
 	aux=rand()%(final+1)+inicio;
 	return aux;
-
 }
 
 int nuevaFicha(){//aleatorio 2 o 4
-
 	int alearorio = randInt(1,100);
 	if(alearorio<=89){
 		return 2;
@@ -93,7 +89,6 @@ int nuevaFicha(){//aleatorio 2 o 4
 }
 
 void buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
-
 	int alearorio=randInt(0,(vacios.num)-1);
 
 	*posI=vacios.matriz[alearorio][0];//devuelvo posicion elejida i,j
@@ -141,7 +136,6 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVac
             }
         }
     }
-    //vacios->num=0;//inicializo el contador de la matriz que guarda los vacios
     for( ; k!=I.final && h!=J.final; k+=I.incremento, h+=J.incremento ){//relleno con 0 al final de la fila-columna
         nueva->matriz[k][h]=0;
 
@@ -293,13 +287,9 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
                 undo (tablero2, tablero1, tableroAux);
                 *hiceUndo=1;
                 movimientosValidos(*tablero1, movimientos);
-
-                //printf("\n");
-                //ImprimirTablero (tablero1); Devuelve 0
             }else{
                 *hiceUndo=0;
                 error=ERR_UNDO;
-                //printf("No puedes realizar undo\n");
             }
         }else if(accion==1 || accion==2 || accion==3 || accion==4){//si es movimiento valido
             if(movimientos[accion-1]!=0){
@@ -309,106 +299,10 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
                 *hiceUndo=0;
                 movimientosValidos(*tablero1, movimientos);
                 *perdi=fperdi(movimientos, *tablero1);
-                //printf("\n");
-                //ImprimirTablero (tablero1);
             }else{
                 error=ERR_MOV;
-                //printf("Movimiento no valido!\n");
             }
 
         }
-
     return error;
-
 }
-/*
-int main(){
-	srand(time(NULL));
-	int accion,hiceUndo=1,gane=0,perdi=0;;
-	tablero tablero1;
-	tablero tablero2;
-	tablero tableroAux;
-	casVacios casVacios;
-	int movimientos[4];
-    inicializo(&tablero1,&tablero2,&casVacios,DIFICIL,movimientos);
-	ImprimirTablero (tablero1);
-	
-	while(!gane && !perdi && (accion=getint("Ingrese un movimiento\n"))!=6){
-		if(direccion==5){//hago undo
-			if(tablero1.undos>0 && !hiceUndo){
-				undo (&tablero2, &tablero1, &tableroAux);
-				hiceUndo=1;
-                movimientosValidos(tablero1, movimientos);
-
-				printf("\n");
-				ImprimirTablero (tablero1);
-			}else{
-				hiceUndo=0;
-				printf("No puedes realizar undo\n");
-			}
-		}else if(direccion==1 || direccion==2 || direccion==3 || direccion==4){//si es movimiento valido
-			if(movimientos[direccion-1]!=0){
-            	gane = muevoTablero(direccion,tablero1,&tablero2,&casVacios);
-            	swapTableros (&tablero1, &tablero2, &tableroAux);
-                pongoFicha (&tablero1,casVacios);
-                hiceUndo=0;
-                movimientosValidos(tablero1, movimientos);
-                perdi=fperdi(movimientos, tablero1);
-                printf("\n");
-                ImprimirTablero (tablero1);
-            }else{
-				printf("Movimiento no valido!\n");
-            }
-
-		}else{//error
-			printf("Por favor ingrese un movimiento valido!!\n");
-		}
-*//*******
- if(!jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion)){
-    ImprimirTablero(tablero1);
- }
-
-
-	}
-	if(gane){
-		printf("\n\n**********Felicitaciones has ganado!!!**********\n\n");
-	}
-    if (perdi){
-        printf("Lo lamento has perdido!\n");
-    }
-	return 0;
-
-}
-
-void ImprimirTablero( tablero tablero){
-    int i,j;
-    printf("PUNTAJE:%d\n",tablero.puntaje);
-    printf("UNDOS:%d\n",tablero.undos);
-    for(i=0;i<tablero.dim;i++){
-        for(j=0;j<tablero.dim;j++){
-            printf("%d\t", tablero.matriz[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-void Imprimecasvacios (casVacios casVacios){
-    printf("NUM=%d\n",casVacios.num );
-	for (int i = 0; i < casVacios.num; ++i)
-	{
-		printf("%d\t%d\n",casVacios.matriz[i][0], casVacios.matriz[i][1] );
-	}
-	
-
-}
-
-void ImprimeMovimientos (int movimientos[]){
-	for (int i = 0; i < 4; i++)
-	{
-		printf("%d\t",movimientos[i]);
-	}
-	printf("\n");
-	
-
-}*/
