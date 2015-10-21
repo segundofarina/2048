@@ -75,7 +75,7 @@ void presentacion(){
 	printf("\n\n\n");
 	printf("***********************************\n");
 	printf("*                                 *\n");
-	printf("*       Bienvenidos al 2048       *\n");
+	printf("*       Bienvenido al 2048        *\n");
 	printf("*                                 *\n");
 	printf("***********************************\n\n");
 }
