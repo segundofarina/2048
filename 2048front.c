@@ -13,10 +13,10 @@
 #define IZQUIERDA 1
 #define ARRIBA 2
 #define DERECHA 3
-#define ABAJO 4*/
+#define ABAJO 4
 #define SAVE 7
 #define QUIT 6
-#define UNDO 5/*
+#define UNDO 5
 #define FACIL 4
 #define INTERMEDIO 5
 #define DIFICIL 6
