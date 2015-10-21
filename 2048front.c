@@ -14,6 +14,10 @@ int pedirJugada();
 
 void getAccion(char comando[]);
 
+int getsn();
+
+int preguntoSave();
+
 void ImprimirTablero(sTablero tablero);
 
 void ImprimirError(int error);
@@ -60,9 +64,15 @@ int main(){
         printf("\n\n********** Lo lamento has perdido! **********\n");
         printf("**********  Tu puntuacion fue: %d  **********\n\n",tablero1.puntaje);
     }else if(accion==QUIT){
+    	resp = preguntoSave();
+    	if(resp==1){
+    		//guardo
+    	}else{
+    		return 0;//salgo
+    	}
 
     }else if(accion==SAVE){
-
+    	//guardo
     }else{
     	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
     	return 1;
@@ -149,6 +159,36 @@ void getAccion(char comando[]){
 		}
 	}
 	comando[i]=0;
+}
+
+int getsn(){
+	char c;
+	char string[MAX_LENGTH];
+	int i=0;
+	while((c=getchar())!='\n'){
+		if(i<MAX_LENGTH){
+			string[i++]=c;
+		}
+	}
+	if(i!=1){//error
+		return -1;
+	}else if(string[0]=='s'){
+		return 1;
+	}else if(string[0]=='n'){
+		return 0;
+	}else{
+		//error
+		return -1;
+	}
+}
+
+int preguntoSave(){
+	int resp;
+	printf("Desea guradar la partida?(s/n)\n");
+	while((resp=getsn())==-1){//valido s o n
+		printf("Comando no valido (s/n)\n");
+	}
+	return resp;
 }
 
 void ImprimirTablero(sTablero tablero){
