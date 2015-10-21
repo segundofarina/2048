@@ -109,7 +109,8 @@ int menu(){
 	printf("3-Salir\n");
 	resp=getint("ELIJA UNA OPCION:");
 	while (resp >3 || resp<1){
-		resp=getint("que sea valida!!!!!:");
+		printf("\nDato incorrecto\n");
+		resp=getint("ELIJA UNA OPCION:");
 	}
 	if(resp==1){
 		resp=dificultad()+3;
@@ -123,9 +124,11 @@ int dificultad(){
 	printf("1-Facil\n");
 	printf("2-Intermedio\n");
 	printf("3-Dificil\n");
-	do {
-		resp=getint("");
-	}while (resp >3 || resp<1);
+	resp=getint("ELIJA UNA OPCION:");
+	while (resp >3 || resp<1){
+		printf("\nDato incorrecto\n");
+		resp=getint("ELIJA UNA OPCION:");
+	}
 	return resp;
 }
 
@@ -150,6 +153,7 @@ int pedirJugada(){
 		}else if(!strcmp(comando,"save")){//modificar
 			resp=SAVE;
 		}else{
+			printf("** Comando no valido. **\n");
 			resp=-1;
 		}
 	}

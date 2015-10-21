@@ -282,7 +282,7 @@ void inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios
 
 int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
     int error=0;
-        if(accion==5){//hago undo
+        if(accion==UNDO){//hago undo
             if(tablero1->undos>0 && !*hiceUndo){
                 undo (tablero2, tablero1, tableroAux);
                 *hiceUndo=1;
@@ -291,7 +291,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
                 *hiceUndo=0;
                 error=ERR_UNDO;
             }
-        }else if(accion==1 || accion==2 || accion==3 || accion==4){//si es movimiento valido
+        }else if(accion==IZQUIERDA || accion==ARRIBA || accion==DERECHA || accion==ABAJO){//si es movimiento valido
             if(movimientos[accion-1]!=0){
                 *gane = muevoTablero(accion,*tablero1,tablero2,casVacios);
                 swapTableros (tablero1, tablero2, tableroAux);
