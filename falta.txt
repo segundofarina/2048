@@ -9,5 +9,3 @@ comentar archivos
 makefile
 
 salir y preguntar si quiere guardar
-
-agregar 2 fichas al inicio
