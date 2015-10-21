@@ -7,5 +7,3 @@ separacion del nombre del archivo en funcion pedirJugada
 comentar archivos
 
 makefile
-
-salir y preguntar si quiere guardar
