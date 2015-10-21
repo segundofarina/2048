@@ -299,7 +299,12 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
                 *hiceUndo=0;
                 movimientosValidos(*tablero1, movimientos);
                 *perdi=fperdi(movimientos, *tablero1);
-            }else{
+            }
+            else if (movimientos[IZQUIERDA-1]==0&& movimientos[ARRIBA-1]==0&& movimientos[DERECHA-1]==0&& movimientos[ABAJO-1]==0&& tablero1->undos!=0){
+                error=ERR_FORZADO;
+            }
+
+            else{
                 error=ERR_MOV;
             }
 

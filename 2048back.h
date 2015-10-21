@@ -18,6 +18,7 @@
 
 #define ERR_UNDO -100
 #define ERR_MOV -99
+#define ERR_FORZADO -98
 
 typedef struct{
     int inicio;

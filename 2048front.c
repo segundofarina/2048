@@ -206,9 +206,12 @@ void ImprimirError(int error){
 	switch(error){
 		case ERR_UNDO:
 			printf("** No puedes realizar undo **\n");
-		break;
+			break;
 		case ERR_MOV:
 			printf("** Movimiento invalido **\n");
-		break;
-	}
+			break;
+		case ERR_FORZADO:
+			printf("** No hay movimientos posibles.Realizar undo **\n");
+			break;
+		}
 }
