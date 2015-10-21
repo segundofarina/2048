@@ -32,24 +32,24 @@ typedef struct{
     int final;
     int incremento;
 
-} movimiento;
+} sMovimiento;
 typedef struct {
     int ** matriz;
     int dim;
     int undos;
     int puntaje;
     int numGanador;
-} tablero;
+} sTablero;
 typedef struct{
     int ** matriz;
     int num;
-} casVacios;
+} sCasVacios;
 /*
 void ImprimirTablero( tablero tablero);
 void Imprimecasvacios (casVacios casVacios);
 void ImprimeMovimientos (int movimientos[]);*/
 
-void creoTablero (tablero * tablero, int dim, int undos, int ganador){
+void creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     int i;
     tablero->puntaje=0;
     tablero->undos=undos;
@@ -61,7 +61,7 @@ void creoTablero (tablero * tablero, int dim, int undos, int ganador){
     }
 }
 
-void creoCasvacios (casVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
+void creoCasvacios (sCasVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
 	int i,j,h=0;
 	casVacios->num=dim*dim;//Incicializa cantidad de casilleros en dim*dim 
 	casVacios->matriz= malloc(dim*dim*sizeof(int* ));
@@ -92,7 +92,7 @@ int nuevaFicha(){//aleatorio 2 o 4
 	}
 }
 
-void buscoCasillero(casVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
+void buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
 
 	int alearorio=randInt(0,(vacios.num)-1);
 
@@ -100,14 +100,14 @@ void buscoCasillero(casVacios vacios, int * posI, int *posJ){ // eligo un casill
 	*posJ=vacios.matriz[alearorio][1];
 }
 
-void pongoFicha(tablero * nuevo, casVacios vacios){//agrego una nueva ficha aleatoria al tablero
+void pongoFicha(sTablero * nuevo, sCasVacios vacios){//agrego una nueva ficha aleatoria al tablero
 	int i,j,ficha=nuevaFicha();
 	buscoCasillero(vacios,&i,&j);
 	nuevo->matriz[i][j]=ficha;
 }
 
 
-int sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios * vacios){
+int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVacios * vacios){
 
     int i,j,k=I.inicio, h=J.inicio, sume=0, gane=0;
 
@@ -152,7 +152,7 @@ int sumoFila(movimiento I, movimiento J, tablero m, tablero * nueva, casVacios *
     return gane;
 }
 
-void descifroMovimiento (int direccion, movimiento * I, movimiento * J,int dim){
+void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim){
 
     switch(direccion){
         case IZQUIERDA:
@@ -191,9 +191,9 @@ void descifroMovimiento (int direccion, movimiento * I, movimiento * J,int dim){
 }
 
 
-int muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vacios){
+int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * vacios){
     /*Creo los dos sentidos de movimiento y recorro la matriz llamando a la funcion que suma las filas en sentido opuesto a la direccion*/
-    movimiento I,J;
+    sMovimiento I,J;
     int gane=0;
 
     descifroMovimiento(direccion,&I,&J,viejo.dim);
@@ -211,19 +211,19 @@ int muevoTablero(int direccion, tablero viejo, tablero * nuevo, casVacios * vaci
     }
     return gane;
 }
-void swapTableros (tablero * tablero1, tablero * tablero2, tablero * aux){/*no hace falta rotarlos solo los igualo*/
+void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux){/*no hace falta rotarlos solo los igualo*/
     *aux=*tablero1;
     *tablero1=*tablero2;
     *tablero2=*aux;
 }
 
-void undo(tablero * tablero1, tablero * tablero2, tablero * aux){
+void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux){
 	swapTableros(tablero1, tablero2, aux);
 	(tablero1->undos)--;
 	(tablero2->undos)--;
 }
 
-void movimientosValidos(tablero tablero1, int movimientos[]){
+void movimientosValidos(sTablero tablero1, int movimientos[]){
 	int i,j;
 	movimientos[0]=0;
 	movimientos[1]=0;
@@ -254,7 +254,7 @@ void movimientosValidos(tablero tablero1, int movimientos[]){
 	}
 }
 
-int fperdi(int movimientos[], tablero tablero){
+int fperdi(int movimientos[], sTablero tablero){
 	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0 && tablero.undos==0){
         return 1;
 	}else{
@@ -262,7 +262,7 @@ int fperdi(int movimientos[], tablero tablero){
 	}
 }
 
-void inicializo(tablero * tablero1, tablero * tablero2, casVacios * casVacios, int dificultad, int movimientos[]){
+void inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
     switch(dificultad){
         case FACIL:
             creoTablero(tablero1,8,8,1024);
@@ -285,7 +285,7 @@ void inicializo(tablero * tablero1, tablero * tablero2, casVacios * casVacios, i
     movimientosValidos(*tablero1, movimientos);
 }
 
-int jugar(tablero * tablero1,tablero * tablero2, tablero * tableroAux,casVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
+int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
     int error=0;
         if(accion==5){//hago undo
             if(tablero1->undos>0 && !*hiceUndo){
@@ -333,7 +333,7 @@ int main(){
 	ImprimirTablero (tablero1);
 	
 	while(!gane && !perdi && (accion=getint("Ingrese un movimiento\n"))!=6){
-		/*if(direccion==5){//hago undo
+		if(direccion==5){//hago undo
 			if(tablero1.undos>0 && !hiceUndo){
 				undo (&tablero2, &tablero1, &tableroAux);
 				hiceUndo=1;
