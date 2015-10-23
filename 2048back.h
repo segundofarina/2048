@@ -19,6 +19,7 @@
 #define ERR_UNDO -100
 #define ERR_MOV -99
 #define ERR_FORZADO -98
+#define ERR_MEMORIA -97
 
 typedef struct{
     int inicio;
@@ -30,7 +31,7 @@ typedef struct {
     int ** matriz;
     int dim;
     int undos;
-    int puntaje;
+    unsigned short int puntaje;
     int numGanador;
 } sTablero;
 typedef struct{
@@ -38,9 +39,9 @@ typedef struct{
     int num;
 } sCasVacios;
 
-void creoTablero (sTablero * tablero, int dim, int undos, int ganador);
+int creoTablero (sTablero * tablero, int dim, int undos, int ganador);
 
-void creoCasvacios (sCasVacios * casVacios, int dim);
+int creoCasvacios (sCasVacios * casVacios, int dim);
 
 int randInt(int inicio, int final);
 
@@ -64,6 +65,8 @@ void movimientosValidos(sTablero tablero1, int movimientos[]);
 
 int fperdi(int movimientos[], sTablero tablero);
 
-void inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]);
+int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]);
 
 int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion);
+
+void guardar(char fileName[], sTablero tablero);

@@ -1,8 +1,8 @@
 #include <string.h>
 #include "2048back.h"
 
-#define MAX_LENGTH 41
-
+#define MAX_LENGTH_COMANDO 5
+#define MAX_LENGTH_FILE_NAME 36
 
 void presentacion();
 
@@ -10,13 +10,15 @@ int menu();
 
 int dificultad();
 
-int pedirJugada();
+int pedirJugada(char fileName[]);
 
-void getAccion(char comando[]);
+void getAccion(char comando[], char fileName[]);
 
 int getsn();
 
 int preguntoSave();
+
+void preguntoFileName(char fileName[]);
 
 void ImprimirTablero(sTablero tablero);
 
@@ -26,10 +28,11 @@ void ImprimirError(int error);
 
 int main(){
 	srand(time(NULL));
-	int resp,accion,jugada,direccion,hiceUndo=1,gane=0,perdi=0;;
+	int resp,accion,jugada,direccion,hiceUndo=1,gane=0,perdi=0,error;
 	sTablero tablero1, tablero2, tableroAux;
 	sCasVacios casVacios;
 	int movimientos[4];
+	char fileName[MAX_LENGTH_FILE_NAME];
 
 	presentacion();
 	resp=menu();
@@ -42,13 +45,17 @@ int main(){
 			return 0;
 		break;
 		case 4:case 5: case 6:
-			inicializo(&tablero1,&tablero2,&casVacios,resp,movimientos);
+			error=inicializo(&tablero1,&tablero2,&casVacios,resp,movimientos);
+			if(error==ERR_MEMORIA){
+				ImprimirError(ERR_MEMORIA);
+				return 1;
+			}
 			ImprimirTablero(tablero1);
 		break;
 
 	}
 
-	while(!gane && !perdi && (accion=pedirJugada())!=QUIT && accion!=SAVE){
+	while(!gane && !perdi && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
 		jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion);
 		if(jugada==0){
 		    ImprimirTablero(tablero1);
@@ -67,12 +74,15 @@ int main(){
     	resp = preguntoSave();
     	if(resp==1){
     		//guardo
+    		preguntoFileName(fileName);
+    		guardar(fileName,tablero1);
     	}else{
     		return 0;//salgo
     	}
 
     }else if(accion==SAVE){
     	//guardo
+    	guardar(fileName,tablero1);
     }else{
     	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
     	return 1;
@@ -122,12 +132,12 @@ int dificultad(){
 	return resp;
 }
 
-int pedirJugada(){
-	char comando[MAX_LENGTH];
+int pedirJugada(char fileName[]){
+	char comando[MAX_LENGTH_COMANDO];
 	int resp=-1;
 	while(resp==-1){
 		printf("Ingrese un comando:\n");
-		getAccion(comando);
+		getAccion(comando,fileName);
 		if(!strcmp(comando,"a")){
 			resp=IZQUIERDA;
 		}else if(!strcmp(comando,"w")){
@@ -150,31 +160,34 @@ int pedirJugada(){
 	return resp;
 }
 
-void getAccion(char comando[]){
+void getAccion(char comando[], char fileName[]){
 	char c;
-	int i=0;
+	int i=0,j=0,var=1;
 	while((c=getchar())!='\n'){
-		if(i<MAX_LENGTH-1){
+		if (var==2 && j<MAX_LENGTH_FILE_NAME){
+			fileName[j++]=c;
+		}
+		if (c==' '){
+			var=2;
+		}
+		if (var==1 && i<MAX_LENGTH_COMANDO){
 			comando[i++]=c;
 		}
 	}
 	comando[i]=0;
+	fileName[j]=0;
 }
 
 int getsn(){
-	char c;
-	char string[MAX_LENGTH];
-	int i=0;
+	char c,sn=0;
 	while((c=getchar())!='\n'){
-		if(i<MAX_LENGTH){
-			string[i++]=c;
+		if(sn==0){
+			sn=c;
 		}
 	}
-	if(i!=1){//error
-		return -1;
-	}else if(string[0]=='s'){
+	if(sn=='s'){
 		return 1;
-	}else if(string[0]=='n'){
+	}else if(sn=='n'){
 		return 0;
 	}else{
 		//error
@@ -189,6 +202,18 @@ int preguntoSave(){
 		printf("Comando no valido (s/n)\n");
 	}
 	return resp;
+}
+
+void preguntoFileName(char fileName[]){
+	char c;
+	int i=0;
+	printf("Ingrese el nombre del archivo:\n");
+	while((c=getchar())!='\n'){
+		if (i<MAX_LENGTH_FILE_NAME){
+			fileName[i++]=c;
+		}
+	}
+	fileName[i]=0;
 }
 
 void ImprimirTablero(sTablero tablero){
@@ -232,6 +257,9 @@ void ImprimirError(int error){
 			break;
 		case ERR_FORZADO:
 			printf("** No hay movimientos posibles.Realizar undo **\n");
+			break;
+		case ERR_MEMORIA:
+			printf("** No dispone de memoria suficiente **\n");
 			break;
 		}
 }

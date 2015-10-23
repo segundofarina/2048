@@ -1,30 +1,45 @@
 #include "2048back.h"
 
-void creoTablero (sTablero * tablero, int dim, int undos, int ganador){
+int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     int i;
     tablero->puntaje=0;
     tablero->undos=undos;
     tablero->numGanador=ganador;
     tablero->dim=dim;
-    tablero->matriz=(int **) calloc(tablero->dim,sizeof(int*));
-    for(i=0;i<tablero->dim; i++){
-        tablero->matriz[i]=(int *) calloc(tablero->dim, sizeof(int));
+    tablero->matriz= calloc(tablero->dim,sizeof(int*));
+    if (tablero->matriz == NULL){
+        return ERR_MEMORIA;
     }
+    for(i=0;i<tablero->dim; i++){
+        tablero->matriz[i]=calloc(tablero->dim, sizeof(int));
+        if (tablero->matriz[i] == NULL){
+            return ERR_MEMORIA;
+        }
+    }
+    return 0;
 }
 
-void creoCasvacios (sCasVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
+int creoCasvacios (sCasVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
 	int i,j,h=0;
 	casVacios->num=dim*dim;//Incicializa cantidad de casilleros en dim*dim 
 	casVacios->matriz= malloc(dim*dim*sizeof(int* ));
+    if (casVacios->matriz == NULL){
+        return ERR_MEMORIA;
+    }
 	for(i=0;i<dim*dim; i++){
         casVacios->matriz[i]= malloc(2*sizeof(int ));
+        if (casVacios->matriz[i] == NULL){
+            return ERR_MEMORIA;
+        }
     }
+
     for(i=0;i<dim;i++){ //Guarda la posicion de todos los casilleros de la matriz
         for(j=0;j<dim;j++){
             casVacios->matriz[h][0]=i;
             casVacios->matriz[h++][1]=j;
         }
     }
+    return 0;
 }
 int randInt(int inicio, int final){//aleatorio entre inicio y final
 	int aux;
@@ -166,7 +181,7 @@ int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * v
     }
     return gane;
 }
-void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux){/*no hace falta rotarlos solo los igualo*/
+void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux){
     *aux=*tablero1;
     *tablero1=*tablero2;
     *tablero2=*aux;
@@ -218,22 +233,45 @@ int fperdi(int movimientos[], sTablero tablero){
 	}
 }
 
-void inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
+int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
+    int error;
     switch(dificultad){
         case FACIL:
-            creoTablero(tablero1,8,8,1024);
-            creoTablero(tablero2,8,8,1024);
-            creoCasvacios(casVacios,8);
+            error=creoTablero(tablero1,8,8,1024);
+            if(error==0){
+                error=creoTablero(tablero2,8,8,1024);
+            }
+            if(error==0){
+                error=creoCasvacios(casVacios,8);
+            }
+            if(error==ERR_MEMORIA){
+                return ERR_MEMORIA;
+            }
+            
             break;
         case INTERMEDIO:
-            creoTablero(tablero1,6,4,2048);
-            creoTablero(tablero2,6,4,2048);
-            creoCasvacios(casVacios,6);
+            error=creoTablero(tablero1,6,4,2048);
+            if(error==0){
+                error=creoTablero(tablero2,6,4,2048);
+            }
+            if(error==0){
+                error=creoCasvacios(casVacios,6);
+            }
+            if(error==ERR_MEMORIA){
+                return ERR_MEMORIA;
+            }
             break;
         case DIFICIL:
-            creoTablero(tablero1,4,3,2048);
-            creoTablero(tablero2,4,3,2048);
-            creoCasvacios(casVacios,4);
+            error=creoTablero(tablero1,4,3,2048);
+            if(error==0){
+                error=creoTablero(tablero2,4,3,2048);
+            }
+            if(error==0){
+                error=creoCasvacios(casVacios,4);
+            }
+            if(error==ERR_MEMORIA){
+                return ERR_MEMORIA;
+            }
             break;
     }
     pongoFicha (tablero1,casVacios);//agrego primer ficha
@@ -241,6 +279,8 @@ void inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios
     pongoFicha (tablero1,casVacios);//agrego segunda ficha
 
     movimientosValidos(*tablero1, movimientos);
+
+    return 0;
 }
 
 int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
@@ -273,4 +313,8 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
 
         }
     return error;
+}
+
+void guardar(char fileName[], sTablero tablero){
+
 }
