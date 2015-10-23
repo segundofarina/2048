@@ -315,6 +315,31 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
     return error;
 }
 
-void guardar(char fileName[], sTablero tablero){
+int guardar(char fileName[], sTablero tablero){
+    int i;
+    FILE * archivo;
+    if (archivo==NULL){
+        return ERR_COPIA;
+    }
+    unsigned short int dificultad;
+    if (tablero.dim==4){
+        dificultad=3;
+    }
+     if (tablero.dim==6){
+        dificultad=2;
+    }
+     if (tablero.dim==8){
+        dificultad=1;
+    }
+    archivo=fopen(fileName,"w");
+    fwrite(&dificultad,sizeof(dificultad),1,archivo);
+    fwrite(&(tablero.puntaje), sizeof(tablero.puntaje),1,archivo);
+    for(i=0;i<tablero.dim; i++){
+        fwrite(tablero.matriz[i],sizeof(tablero.matriz[i]),1,archivo);
+    }
+    fclose(archivo);
+
+    return 0;
+
 
 }
