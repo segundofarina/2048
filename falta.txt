@@ -1,7 +1,3 @@
-funcion para guardar
-
-funcion para abrir archivo guardado
-
 comentar archivos
 
 makefile

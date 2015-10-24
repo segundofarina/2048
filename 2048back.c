@@ -233,9 +233,10 @@ int fperdi(int movimientos[], sTablero tablero){
 	}
 }
 
-int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
-    int error;
-    switch(dificultad){
+int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad){
+	printf("%d\n", dificultad);
+	int error=0;
+	switch(dificultad){
         case FACIL:
             error=creoTablero(tablero1,8,8,1024);
             if(error==0){
@@ -273,6 +274,15 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
                 return ERR_MEMORIA;
             }
             break;
+    }
+    return error;
+}
+
+int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
+    int error;
+    error=creoEntorno(tablero1,tablero2,casVacios,dificultad);
+    if(error!=0){
+    	return error;
     }
     pongoFicha (tablero1,casVacios);//agrego primer ficha
     //modifico casVacios
@@ -315,6 +325,76 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
     return error;
 }
 
-void guardar(char fileName[], sTablero tablero){
+int guardar(char fileName[], sTablero tablero){
+	FILE * archivo;
+	unsigned short int dificultad,i,j;
+	if(tablero.dim==8){
+		dificultad=1;
+	}else if(tablero.dim==6){
+		dificultad=2;
+	}else{
+		dificultad=3;
+	}
+
+	archivo=fopen(fileName,"w");
+
+	if(archivo==NULL){
+		//error de apertura de archivo
+		return ERR_FILE;
+	}
+
+	fwrite(&dificultad,sizeof(dificultad),1,archivo);
+	fwrite(&(tablero.puntaje),sizeof(tablero.puntaje),1,archivo);
+	for(i=0;i<tablero.dim;i++){
+		for(j=0;j<tablero.dim;j++){
+			fwrite(&(tablero.matriz[i][j]),sizeof(tablero.matriz[i][j]),1,archivo);	
+		}
+		
+	}
+
+	fclose(archivo);
+
+	return 0;
+}
+int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]){
+	int error=0;
+	FILE * archivo;
+	unsigned short int dificultad,dim,puntaje,val,i,j;
+
+	archivo=fopen(fileName,"r");
+	if(archivo==NULL){
+		//error de apertura de archivo
+		return ERR_FILE;
+	}
+
+	fread(&dificultad,sizeof(unsigned short int),1,archivo);
+
+	if(dificultad==1){
+		dificultad=FACIL;
+	}else if(dificultad==2){
+		dificultad=INTERMEDIO;
+	}else{
+		dificultad=DIFICIL;
+	}
+
+	error=creoEntorno(tablero1,tablero2,casVacios,dificultad);//creo los tableros
+	if(error!=0){
+		return error;//si hay error termino la ejecucion
+	}
+
+	fread(&puntaje,sizeof(tablero1->puntaje),1,archivo);
+	tablero1->puntaje=puntaje;
+
+	for(i=0;i<(tablero1->dim);i++){
+		for(j=0;j<(tablero1->dim);j++){
+			fread(&val,sizeof(tablero1->matriz[i][j]),1,archivo);
+			tablero1->matriz[i][j]=val;
+		}
+	}
+
+	movimientosValidos(*tablero1, movimientos);
+
+	return 0;
+
 
 }
