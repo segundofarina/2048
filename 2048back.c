@@ -48,8 +48,8 @@ int randInt(int inicio, int final){//aleatorio entre inicio y final
 }
 
 int nuevaFicha(){//aleatorio 2 o 4
-	int alearorio = randInt(1,100);
-	if(alearorio<=89){
+	int aleatorio = randInt(1,100);
+	if(aleatorio<=89){
 		return 2;
 	}else{
 		return 4;
@@ -57,12 +57,12 @@ int nuevaFicha(){//aleatorio 2 o 4
 }
 
 int buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
-	int alearorio=randInt(0,(vacios.num)-1);
+	int aleatorio=randInt(0,(vacios.num)-1);
 
-	*posI=vacios.matriz[alearorio][0];//devuelvo posicion elejida i,j
-	*posJ=vacios.matriz[alearorio][1];
+	*posI=vacios.matriz[aleatorio][0];//devuelvo posicion elejida i,j
+	*posJ=vacios.matriz[aleatorio][1];
 
-	return alearorio;
+	return aleatorio;
 }
 
 void pongoFicha(sTablero * nuevo, sCasVacios * vacios){//agrego una nueva ficha aleatoria al tablero
@@ -239,9 +239,10 @@ int fperdi(int movimientos[], sTablero tablero){
 	}
 }
 
-int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
-    int error;
-    switch(dificultad){
+int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad){
+	printf("%d\n", dificultad);
+	int error=0;
+	switch(dificultad){
         case FACIL:
             error=creoTablero(tablero1,8,8,1024);
             if(error==0){
@@ -279,6 +280,15 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
                 return ERR_MEMORIA;
             }
             break;
+    }
+    return error;
+}
+
+int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
+    int error;
+    error=creoEntorno(tablero1,tablero2,casVacios,dificultad);
+    if(error!=0){
+    	return error;
     }
     pongoFicha (tablero1,casVacios);//agrego primer ficha
     //modifico casVacios
@@ -322,46 +332,67 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
 }
 
 int guardar(char fileName[], sTablero tablero){
-    int i;
     FILE * archivo;
-    if (archivo==NULL){
-        return ERR_COPIA;
-    }
     unsigned short int dificultad;
-    if (tablero.dim==4){
-        dificultad=DIFICIL;
+
+    if (tablero.dim==8){
+        dificultad=1;
     }
      if (tablero.dim==6){
-        dificultad=INTERMEDIO;
+        dificultad=2;
     }
-     if (tablero.dim==8){
-        dificultad=FACIL;
+     if (tablero.dim==4){
+        dificultad=3;
     }
     archivo=fopen(fileName,"w");
+    if (archivo==NULL){
+        return ERR_FILE;
+    }
+
     fwrite(&dificultad,sizeof(dificultad),1,archivo);
-    fwrite(&(tablero.puntaje), sizeof(tablero.puntaje),1,archivo);
-    fwrite(*(tablero.matriz),sizeof(tablero.matriz[0][0]),16,archivo);
-    /*for(i=0;i<tablero.dim; i++){
-        fwrite(tablero.matriz[i],sizeof(int),4,archivo);
-    }*/
-    fclose(archivo);
+    fwrite(&(tablero.puntaje),sizeof(tablero.puntaje),1,archivo);
+    fwrite(&(tablero.undos),sizeof(tablero.undos),1,archivo);
+    fwrite(*(tablero.matriz),sizeof(tablero.matriz[0][0]),tablero.dim*tablero.dim,archivo);
 
-    return 0;
-
-
+	fclose(archivo);
+	return 0;
 }
-void cargarPartida(char fileName[],sTablero * tablero){
-    FILE * archivo;
-    short int dificultad;
-    int i;
-    archivo=fopen("unfo","r");
-    fread(&dificultad,sizeof(dificultad),1,archivo);
-    creoTablero(tablero,4,3,2048);
-    fread(&(tablero->puntaje),sizeof(tablero->puntaje),1,archivo);
-    /*for(i=0;i<tablero->dim; i++){
-        fread(tablero->matriz[0],sizeof(int),4,archivo);
-    }*/
-    fread(*(tablero->matriz),sizeof(tablero->matriz[0][0]),16,archivo);
+
+int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]){
+	int error=0;
+	FILE * archivo;
+	unsigned short int dificultad,dim,val,i,j,undos;
+
+	archivo=fopen(fileName,"r");
+	if(archivo==NULL){
+		//error de apertura de archivo
+		return ERR_FILE;
+	}
+
+	fread(&dificultad,sizeof(dificultad),1,archivo);
+
+	if(dificultad==1){
+		dificultad=FACIL;
+	}else if(dificultad==2){
+		dificultad=INTERMEDIO;
+	}else{
+		dificultad=DIFICIL;
+	}
+
+	error=creoEntorno(tablero1,tablero2,casVacios,dificultad);//creo los tableros
+	if(error!=0){
+		return error;//si hay error termino la ejecucion
+	}
+
+	fread(&(tablero1->puntaje),sizeof(tablero1->puntaje),1,archivo);
+
+    fread(&(tablero1->undos),sizeof(tablero1->undos),1,archivo);
+
+    fread(*(tablero1->matriz),sizeof(tablero1->matriz[0][0]),tablero1->dim*tablero1->dim,archivo);
+
     fclose(archivo);
-    //printf("%d\n",dificultad);
+
+	movimientosValidos(*tablero1, movimientos);
+
+	return 0;
 }

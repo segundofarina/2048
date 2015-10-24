@@ -20,7 +20,8 @@
 #define ERR_MOV -99
 #define ERR_FORZADO -98
 #define ERR_MEMORIA -97
-#define ERR_COPIA -96
+#define ERR_FILE -96
+#define ERR_SAVE -95
 
 typedef struct{
     int inicio;
@@ -72,4 +73,4 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
 
 int guardar(char fileName[], sTablero tablero);
 
-void cargarPartida(char fileName[],sTablero * tablero);
+int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]);

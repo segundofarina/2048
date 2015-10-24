@@ -1,7 +1,7 @@
-funcion para guardar
-
-funcion para abrir archivo guardado
-
 comentar archivos
 
 makefile
+
+agregar const
+
+cambiar tipos de variable en tablero
