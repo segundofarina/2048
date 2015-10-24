@@ -11,7 +11,7 @@ int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
         return ERR_MEMORIA;
     }
     for(i=0;i<tablero->dim; i++){
-        tablero->matriz[i]=calloc(tablero->dim, sizeof(int));
+        tablero->matriz[i]=calloc(tablero->dim,sizeof(int));
         if (tablero->matriz[i] == NULL){
             return ERR_MEMORIA;
         }
@@ -352,7 +352,7 @@ int guardar(char fileName[], sTablero tablero){
     fwrite(&dificultad,sizeof(dificultad),1,archivo);
     fwrite(&(tablero.puntaje),sizeof(tablero.puntaje),1,archivo);
     fwrite(&(tablero.undos),sizeof(tablero.undos),1,archivo);
-    fwrite(*(tablero.matriz),sizeof(tablero.matriz[0][0]),tablero.dim*tablero.dim,archivo);
+    fwrite(*(tablero.matriz),sizeof(tablero.matriz[0][0]),(tablero.dim)*(tablero.dim),archivo);
 
 	fclose(archivo);
 	return 0;
@@ -388,7 +388,7 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
 
     fread(&(tablero1->undos),sizeof(tablero1->undos),1,archivo);
 
-    fread(*(tablero1->matriz),sizeof(tablero1->matriz[0][0]),tablero1->dim*tablero1->dim,archivo);
+    fread(*(tablero1->matriz),sizeof(tablero1->matriz[0][0]),(tablero1->dim)*(tablero1->dim),archivo);
 
     fclose(archivo);
 

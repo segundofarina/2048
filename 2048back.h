@@ -32,7 +32,7 @@ typedef struct{
 typedef struct {
     int ** matriz;
     int dim;
-    int undos;
+    unsigned short int undos;
     unsigned short int puntaje;
     int numGanador;
 } sTablero;
