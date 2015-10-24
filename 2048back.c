@@ -345,6 +345,7 @@ int guardar(char fileName[], sTablero tablero){
 
 	fwrite(&dificultad,sizeof(dificultad),1,archivo);
 	fwrite(&(tablero.puntaje),sizeof(tablero.puntaje),1,archivo);
+    fwrite(&(tablero.undos),sizeof(tablero.undos),1,archivo);
 	for(i=0;i<tablero.dim;i++){
 		for(j=0;j<tablero.dim;j++){
 			fwrite(&(tablero.matriz[i][j]),sizeof(tablero.matriz[i][j]),1,archivo);	
@@ -359,7 +360,7 @@ int guardar(char fileName[], sTablero tablero){
 int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]){
 	int error=0;
 	FILE * archivo;
-	unsigned short int dificultad,dim,puntaje,val,i,j;
+	unsigned short int dificultad,dim,puntaje,val,i,j,undos;
 
 	archivo=fopen(fileName,"r");
 	if(archivo==NULL){
@@ -384,6 +385,9 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
 
 	fread(&puntaje,sizeof(tablero1->puntaje),1,archivo);
 	tablero1->puntaje=puntaje;
+
+    fread(&undos,sizeof(tablero1->undos),1,archivo);
+    tablero1->undos=undos;
 
 	for(i=0;i<(tablero1->dim);i++){
 		for(j=0;j<(tablero1->dim);j++){
