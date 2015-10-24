@@ -39,6 +39,8 @@ int main(){
 	
 	switch(resp){
 		case 2://cargo partida guradada
+			cargarPartida(fileName,&tablero1);
+			ImprimirTablero(tablero1);
 
 		break;
 		case 3:

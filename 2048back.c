@@ -66,15 +66,21 @@ int buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casill
 }
 
 void pongoFicha(sTablero * nuevo, sCasVacios * vacios){//agrego una nueva ficha aleatoria al tablero
-	int i,j,pos,ficha=nuevaFicha();
+	int i,j,pos,ficha=nuevaFicha(),aux[2];
 	pos=buscoCasillero(*vacios,&i,&j);
 	nuevo->matriz[i][j]=ficha;
 	//borro posicion vacia usada
+    vacios->matriz[pos][0]=aux[0]; /*En vez de correr todos intercambio el ultimo con el que use y despues achico la dimension del vector*/
+    vacios->matriz[pos][1]=aux[1];
+    vacios->matriz[pos][0]=vacios->matriz[vacios->num-1][0];
+    vacios->matriz[pos][1]=vacios->matriz[vacios->num-1][1];
+    vacios->matriz[vacios->num-1][0]=aux[0];
+    vacios->matriz[vacios->num-1][1]=aux[1];
 	(vacios->num)--;
-	for(;pos<(vacios->num);pos++){
+	/*for(;pos<(vacios->num);pos++){
 		vacios->matriz[pos][0]=vacios->matriz[pos+1][0];
 		vacios->matriz[pos][1]=vacios->matriz[pos+1][1];
-	}
+	}*/
 }
 
 
@@ -323,23 +329,39 @@ int guardar(char fileName[], sTablero tablero){
     }
     unsigned short int dificultad;
     if (tablero.dim==4){
-        dificultad=3;
+        dificultad=DIFICIL;
     }
      if (tablero.dim==6){
-        dificultad=2;
+        dificultad=INTERMEDIO;
     }
      if (tablero.dim==8){
-        dificultad=1;
+        dificultad=FACIL;
     }
     archivo=fopen(fileName,"w");
     fwrite(&dificultad,sizeof(dificultad),1,archivo);
     fwrite(&(tablero.puntaje), sizeof(tablero.puntaje),1,archivo);
-    for(i=0;i<tablero.dim; i++){
-        fwrite(tablero.matriz[i],sizeof(tablero.matriz[i]),1,archivo);
-    }
+    fwrite(*(tablero.matriz),sizeof(tablero.matriz[0][0]),16,archivo);
+    /*for(i=0;i<tablero.dim; i++){
+        fwrite(tablero.matriz[i],sizeof(int),4,archivo);
+    }*/
     fclose(archivo);
 
     return 0;
 
 
+}
+void cargarPartida(char fileName[],sTablero * tablero){
+    FILE * archivo;
+    short int dificultad;
+    int i;
+    archivo=fopen("unfo","r");
+    fread(&dificultad,sizeof(dificultad),1,archivo);
+    creoTablero(tablero,4,3,2048);
+    fread(&(tablero->puntaje),sizeof(tablero->puntaje),1,archivo);
+    /*for(i=0;i<tablero->dim; i++){
+        fread(tablero->matriz[0],sizeof(int),4,archivo);
+    }*/
+    fread(*(tablero->matriz),sizeof(tablero->matriz[0][0]),16,archivo);
+    fclose(archivo);
+    //printf("%d\n",dificultad);
 }

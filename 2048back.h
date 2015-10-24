@@ -71,3 +71,5 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
 int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion);
 
 int guardar(char fileName[], sTablero tablero);
+
+void cargarPartida(char fileName[],sTablero * tablero);
