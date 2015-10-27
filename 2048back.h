@@ -30,7 +30,7 @@ typedef struct{
 
 } sMovimiento;
 typedef struct {
-    int ** matriz;
+    unsigned short int ** matriz;
     int dim;
     unsigned short int undos;
     unsigned short int puntaje;

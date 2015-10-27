@@ -6,12 +6,12 @@ int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     tablero->undos=undos;
     tablero->numGanador=ganador;
     tablero->dim=dim;
-    tablero->matriz= calloc(tablero->dim,sizeof(int*));
+    tablero->matriz= calloc(tablero->dim,sizeof(unsigned short int*));
     if (tablero->matriz == NULL){
         return ERR_MEMORIA;
     }
     for(i=0;i<tablero->dim; i++){
-        tablero->matriz[i]=calloc(tablero->dim,sizeof(int));
+        tablero->matriz[i]=calloc(tablero->dim,sizeof(unsigned short int));
         if (tablero->matriz[i] == NULL){
             return ERR_MEMORIA;
         }
