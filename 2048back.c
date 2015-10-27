@@ -240,7 +240,6 @@ int fperdi(int movimientos[], sTablero tablero){
 }
 
 int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad){
-	printf("%d\n", dificultad);
 	int error=0;
 	switch(dificultad){
         case FACIL:
@@ -305,6 +304,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
             if(tablero1->undos>0 && !*hiceUndo){
                 undo (tablero2, tablero1, tableroAux);
                 *hiceUndo=1;
+                (casVacios->num)++;//vuelvo a agregar el casillro en el que puse la ficha en la jugada anterior
                 movimientosValidos(*tablero1, movimientos);
             }else{
                 *hiceUndo=0;
@@ -332,67 +332,71 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
 }
 
 int guardar(char fileName[], sTablero tablero){
-    FILE * archivo;
-    unsigned short int dificultad;
+   FILE * archivo;
+   unsigned short int dificultad,i,j;
+   if(tablero.dim==8){
+       dificultad=1;
+   }else if(tablero.dim==6){
+       dificultad=2;
+   }else{
+       dificultad=3;
+   }
 
-    if (tablero.dim==8){
-        dificultad=1;
+   archivo=fopen(fileName,"w");
+
+   if(archivo==NULL){
+       //error de apertura de archivo
+      return ERR_FILE;
+   }
+
+   fwrite(&dificultad,sizeof(dificultad),1,archivo);
+   fwrite(&(tablero.puntaje),sizeof(tablero.puntaje),1,archivo);
+   fwrite(&(tablero.undos),sizeof(tablero.undos),1,archivo);
+    for(i=0;i<tablero.dim;i++){
+        fwrite((tablero.matriz[i]),sizeof(tablero.matriz[0][0]),tablero.dim,archivo); 
     }
-     if (tablero.dim==6){
-        dificultad=2;
-    }
-     if (tablero.dim==4){
-        dificultad=3;
-    }
-    archivo=fopen(fileName,"w");
-    if (archivo==NULL){
+
+   fclose(archivo);
+
+   return 0;
+}
+int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]){
+    int error=0;
+    FILE * archivo;
+    unsigned short int dificultad,dim,puntaje,val,i,j;
+
+    archivo=fopen(fileName,"r");
+    if(archivo==NULL){
+       //error de apertura de archivo
         return ERR_FILE;
     }
 
-    fwrite(&dificultad,sizeof(dificultad),1,archivo);
-    fwrite(&(tablero.puntaje),sizeof(tablero.puntaje),1,archivo);
-    fwrite(&(tablero.undos),sizeof(tablero.undos),1,archivo);
-    fwrite(*(tablero.matriz),sizeof(tablero.matriz[0][0]),(tablero.dim)*(tablero.dim),archivo);
+    fread(&dificultad,sizeof(unsigned short int),1,archivo);
 
-	fclose(archivo);
-	return 0;
-}
+    if(dificultad==1){
+        dificultad=FACIL;
+    }else if(dificultad==2){
+        dificultad=INTERMEDIO;
+    }else{
+        dificultad=DIFICIL;
+    }
 
-int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]){
-	int error=0;
-	FILE * archivo;
-	unsigned short int dificultad,dim,val,i,j,undos;
+    error=creoEntorno(tablero1,tablero2,casVacios,dificultad);//creo los tableros
+    if(error!=0){
+        return error;//si hay error termino la ejecucion
+    }
 
-	archivo=fopen(fileName,"r");
-	if(archivo==NULL){
-		//error de apertura de archivo
-		return ERR_FILE;
-	}
-
-	fread(&dificultad,sizeof(dificultad),1,archivo);
-
-	if(dificultad==1){
-		dificultad=FACIL;
-	}else if(dificultad==2){
-		dificultad=INTERMEDIO;
-	}else{
-		dificultad=DIFICIL;
-	}
-
-	error=creoEntorno(tablero1,tablero2,casVacios,dificultad);//creo los tableros
-	if(error!=0){
-		return error;//si hay error termino la ejecucion
-	}
-
-	fread(&(tablero1->puntaje),sizeof(tablero1->puntaje),1,archivo);
-
+    fread(&(tablero1->puntaje),sizeof(tablero1->puntaje),1,archivo);
     fread(&(tablero1->undos),sizeof(tablero1->undos),1,archivo);
 
-    fread(*(tablero1->matriz),sizeof(tablero1->matriz[0][0]),(tablero1->dim)*(tablero1->dim),archivo);
+    for(i=0;i<(tablero1->dim);i++){
+        //for(j=0;j<(tablero1->dim);j++){
+            fread((tablero1->matriz[i]),sizeof(tablero1->matriz[0][0]),tablero1->dim,archivo);
+        //}
+    }
 
-    fclose(archivo);
+    movimientosValidos(*tablero1, movimientos);
 
-	movimientosValidos(*tablero1, movimientos);
+    return 0;
 
-	return 0;
 }
