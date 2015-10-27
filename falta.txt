@@ -3,5 +3,3 @@ comentar archivos
 makefile
 
 agregar const
-
-cambiar tipos de variable en tablero
