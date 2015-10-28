@@ -250,12 +250,13 @@ void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux){
     *tablero2=*aux;
 }
 
+
 void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux){
 	swapTableros(tablero1, tablero2, aux);
 	(tablero1->undos)--;
 	(tablero2->undos)--;
 }
-
+/* Alamcena en un vector movimentos 1 si el movimiento es valido en cada direccion o 0 en caso contrario */
 void movimientosValidos(sTablero tablero1, int movimientos[]){
 	int i,j;
 	movimientos[0]=0;
@@ -264,38 +265,47 @@ void movimientosValidos(sTablero tablero1, int movimientos[]){
 	movimientos[3]=0;
 	for(i=0;i<tablero1.dim && (movimientos[0]==0 || movimientos[1]==0 || movimientos[2]==0 || movimientos[3]==0);i++){
 		for(j=0;j<tablero1.dim && (movimientos[0]==0 || movimientos[1]==0 || movimientos[2]==0 || movimientos[3]==0);j++){
-			if(tablero1.matriz[i][j]!=0){//busco casillero que no es 0
-				if(j!=0 && tablero1.matriz[i][j-1]==0){//si tengo 0 a la izquierda me puedo mover para la izquierda
+			/*busco casillero que no es 0*/
+			if(tablero1.matriz[i][j]!=0){
+				/*si tengo 0 a la izquierda me puedo mover para la izquierda*/
+				if(j!=0 && tablero1.matriz[i][j-1]==0){
 					movimientos[0]=1;
 				}
-				if(i!=0 && tablero1.matriz[i-1][j]==0){//si tengo 0 arriba me puedo mover para arriba
+				/*si tengo 0 arriba me puedo mover para arriba*/
+				if(i!=0 && tablero1.matriz[i-1][j]==0){
 					movimientos[1]=1;
 				}
-				if(j!=tablero1.dim-1 && tablero1.matriz[i][j+1]==0){//si tengo 0 a la derecha me puedo mover para la derecha
+				/* si tengo 0 a la derecha me puedo mover para la derecha*/
+				if(j!=tablero1.dim-1 && tablero1.matriz[i][j+1]==0){
 					movimientos[2]=1;
 				}
-				if(i!=tablero1.dim-1 && tablero1.matriz[i+1][j]==0){//si tengo un 0 abajo me puedo mover para abajo
+				/* si tengo un 0 abajo me puedo mover para abajo*/
+				if(i!=tablero1.dim-1 && tablero1.matriz[i+1][j]==0){
 					movimientos[3]=1;
 				}
-				if(j!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i][j+1]){//numeros pegados en fila
+				/*numeros pegados en fila*/
+				if(j!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i][j+1]){
 					movimientos[0]=movimientos[2]=1;
 				}
-				if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){//numeros pegados en columna
+				/* numeros pegados en columna*/
+				if(i!=tablero1.dim-1 && tablero1.matriz[i][j]==tablero1.matriz[i+1][j]){
 					movimientos[1]=movimientos[3]=1;
 				}
 			}
 		}
 	}
 }
-
+/* Si no hay movimientos validos en ninguna dirrecion y no tengo mas undos devulve 1*/
 int fperdi(const int movimientos[], sTablero tablero){
 	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0 && tablero.undos==0){
-        return 1;
+        	return 1;
 	}else{
 		return 0;
 	}
 }
-
+/*Dependiendo de la dificultad ingresada por parametero se crean dos tableros, y la estructura de 
+** casilleros vacios. Elprimer tablero alamcena la partida actual, el segundo tablero alamcena la
+** juagada anterior para luego poder realizar el undo.*/
 int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad){
 	int error=0;
 	switch(dificultad){
@@ -340,6 +350,7 @@ int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios
     return error;
 }
 
+/*Crea el entorno de juego y pone las dos fichas iniciales en el tablero1.*/
 int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]){
     int error;
     error=creoEntorno(tablero1,tablero2,casVacios,dificultad);
@@ -354,7 +365,8 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
 
     return 0;
 }
-
+/*Llama a las subfunciones que se encargan de realizar la jugada, devuelve si hubo un error y deja
+** en parametros de salida si se gano o perdio la partida */
 int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
     int error=0;
         if(accion==UNDO){//hago undo
@@ -387,7 +399,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
         }
     return error;
 }
-
+/*Guarada la partida en un archivo en el siguente orden: dificultad,puntaje,undos y fichas del tablero */
 int guardar(const char fileName[], sTablero tablero){
    FILE * archivo;
    unsigned short int dificultad,i,j;
@@ -442,9 +454,12 @@ int casilleroValido(int val, int numGanador){
     return 0;
 }
 
+/*Valido el archivo cargado. Verificando que el puntaje sea mayor o igual a 0 y par,
+** que la cantidad de undos sea mayor o igual a 0 y sea menor a lo pre-establecido 
+** segun la dificultad y que las fichas sean potencias de dos.*/
 int validoPartida(sTablero tablero){
     int i,j,error=0;
-    if(tablero.puntaje<0 || tablero.puntaje%2==1){//valido puntaje
+    if(tablero.puntaje<=0 || tablero.puntaje%2==1){//valido puntaje
         error=ERR_FILE_VALID;
     }
     if(!error && tablero.dim==8 && (tablero.undos>8 || tablero.undos<0)){//valido undos
@@ -461,6 +476,8 @@ int validoPartida(sTablero tablero){
     }
     return error;
 }
+/* Leo un archivo y lo valido. Creo el entorno de juego.
+*/
 int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], const char fileName[]){
     int error=0;
     FILE * archivo;
