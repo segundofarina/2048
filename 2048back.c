@@ -184,7 +184,7 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVac
     }
     return gane;
 }
-
+/*Guarda en la estrcura de movimento como debe recorrese la matriz*/
 void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim){
 
     switch(direccion){
@@ -223,9 +223,10 @@ void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim
     }
 }
 
-
+/*Indica como se debe mover cada linea de la matriz*/
 int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * vacios){
-    /*Creo los dos sentidos de movimiento y recorro la matriz llamando a la funcion que suma las filas en sentido opuesto a la direccion*/
+    /* Creo los dos sentidos de movimiento y recorro la matriz llamando a la funcion
+    ** que suma las filas en sentido opuesto a la direccion.*/
     sMovimiento I,J;
     int gane=0;
 
@@ -233,7 +234,7 @@ int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * v
 
     nuevo->puntaje=viejo.puntaje;
 
-    vacios->num=0;//inicializo el contador de la matriz que guarda los vacios
+    vacios->num=0;/*inicializo el contador de la matriz que guarda los vacios*/
 
     for ( ; I.inicio!=I.final && J.inicio!=J.final; I.inicio+=abs(J.incremento), J.inicio+=abs(I.incremento) )
     {
@@ -244,13 +245,15 @@ int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * v
     }
     return gane;
 }
+
+/*Pone en tablero1 el tablero actual y en tablero2 el tablero de la jugada anterior*/
 void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux){
     *aux=*tablero1;
     *tablero1=*tablero2;
     *tablero2=*aux;
 }
 
-
+/* Rota los tableros y decremento la cantidad de undos*/
 void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux){
 	swapTableros(tablero1, tablero2, aux);
 	(tablero1->undos)--;
