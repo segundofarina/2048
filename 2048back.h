@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+
 #include "getnum.h"
 
 
@@ -9,26 +9,44 @@
 #define DERECHA 3
 #define ABAJO 4
 #define UNDO 5
-#define QUIT 6
-#define SAVE 7
 
 #define FACIL 4
 #define INTERMEDIO 5
 #define DIFICIL 6
 
-#define ERR_UNDO -100
-#define ERR_MOV -99
-#define ERR_FORZADO -98
-#define ERR_MEMORIA -97
-#define ERR_FILE -96
-#define ERR_SAVE -95
 
-typedef struct{
+/*
+**Defino variables simbolicas con numeros negativos comenzando del -100 para indicar
+**los distintos tipos de errores.
+*/
+#define ERR_UNDO -100       /*El jugador se ha quedado sin undos para realizar
+                            **o realizo un undo en la jugaad anterior*/
+#define ERR_MOV -99         /*No exsiten movimientos en la direccion ingresada*/
+#define ERR_FORZADO -98     /* No existen movimientos en ninguna direccion y solo se
+                            **pueden realizar undos*/
+#define ERR_MEMORIA -97     /*No hay memoria suficiente para inicializar la partida*/
+#define ERR_FILE -96        /*No se ha podido leer el archivo correctamente*/
+#define ERR_SAVE -95        /*No se ha podido escirbir el archivo correctamente*/
+#define ERR_FILE_VALID -94  /*El archivo ingresado no tiene un formato valido*/
+
+/*
+** Defino la estructura sMovimiento que almacenara, segun el movimiento ingresado,
+** los valores de inicio, final e incremento que utilizara para recorrer la matriz
+** en ese sentido.
+*/
+typedef struct{             
     int inicio;
     int final;
     int incremento;
 
 } sMovimiento;
+
+/*
+** Defino la estructura sTablero que alamacenara el tablero, su dimension,
+** la cantidad
+** de undos restantes, el puntaje y el numero con el que se gana el juego.
+*/
+
 typedef struct {
     unsigned short int ** matriz;
     int dim;
@@ -36,41 +54,42 @@ typedef struct {
     unsigned short int puntaje;
     int numGanador;
 } sTablero;
+
+/*
+** Defino la estructura sCasVacios que permite almacenar las posiciones del tablero
+** que se encuentran vacias (con ceros). Estas se guardan en una matriz de 2x(dim*dim)
+** siendo dim la dimension del tablero. Num sera la cantidad de espacios vaios que 
+** tengo luego de cada jugada.
+*/
+
 typedef struct{
     int ** matriz;
     int num;
 } sCasVacios;
 
-int creoTablero (sTablero * tablero, int dim, int undos, int ganador);
 
-int creoCasvacios (sCasVacios * casVacios, int dim);
 
-int randInt(int inicio, int final);
-
-int nuevaFicha();
-
-int buscoCasillero(sCasVacios vacios, int * posI, int *posJ);
-
-void pongoFicha(sTablero * nuevo, sCasVacios * vacios);
-
-int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVacios * vacios);
-
-void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim);
-
-int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * vacios);
-
-void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux);
-
-void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux);
-
-void movimientosValidos(sTablero tablero1, int movimientos[]);
-
-int fperdi(int movimientos[], sTablero tablero);
-
+/*
+** La funcion incializo se llama al incio del programa y se encarga de crear los tableros,
+** y la matriz de casilleros vacios, segun la dificultad ingresada. Y luego pone dos fichas
+** en el tablero. Devuelve 0 si no hubieron errores o el codigo del error.
+*/
 int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad, int movimientos[]);
 
+
+/*
+** Jugar controla el flujo del juego, realizando la accion ingresada por el usuario. 
+*/
 int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion);
 
-int guardar(char fileName[], sTablero tablero);
+/*
+** La funcion guardar almacena la partida en el archivo pasado por parametro
+*/
+int guardar(const char fileName[], sTablero tablero);
 
-int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]);
+/*
+** La funcion cargoPartida lee el archivo pasado por parametro y de acuerdo a
+** la informacion que contiene crea el entorno de juego y completa los tableros
+** con la informacion del archivo. 
+*/
+int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[],const char fileName[]);

@@ -1,9 +1,14 @@
 #include <string.h>
+#include <time.h>
 #include "2048back.h"
+
+#define QUIT 6
+#define SAVE 7
 
 #define MAX_LENGTH_COMANDO 5
 #define MAX_LENGTH_FILE_NAME 36
-#define MAX_LENGTH_FILE (MAX_LENGTH_FILE_NAME+8)
+
+
 
 void presentacion();
 
@@ -33,7 +38,7 @@ int main(){
 	sTablero tablero1, tablero2, tableroAux;
 	sCasVacios casVacios;
 	int movimientos[4];
-	char fileName[MAX_LENGTH_FILE];
+	char fileName[MAX_LENGTH_FILE_NAME];
 
 	presentacion();
 	resp=menu();
@@ -48,6 +53,10 @@ int main(){
 			}else if(error==ERR_FILE){
 				ImprimirError(ERR_FILE);
 				return 1;
+			}
+			else if(error==ERR_FILE_VALID){
+				ImprimirError(ERR_FILE_VALID);
+				//return 1;
 			}
 			ImprimirTablero(tablero1);
 		break;
@@ -97,6 +106,9 @@ int main(){
 
     }else if(accion==SAVE){
     	//guardo
+    	if (fileName[0]==0){
+    		preguntoFileName(fileName);
+    	}
     	resp=guardar(fileName,tablero1);
 		if(resp==0){
 			printf("\n\n** La partida %s se guardo correctamente **\n\n", fileName);
@@ -195,16 +207,6 @@ void getAccion(char comando[], char fileName[]){
 		}
 	}
 	comando[i]=0;
-	if(j!=0){
-		fileName[j++]='.';
-		fileName[j++]='2';
-		fileName[j++]='0';
-		fileName[j++]='4';
-		fileName[j++]='8';
-		fileName[j++]='d';
-		fileName[j++]='a';
-		fileName[j++]='t';
-	}
 	fileName[j]=0;
 }
 
@@ -243,16 +245,7 @@ void preguntoFileName(char fileName[]){
 			fileName[i++]=c;
 		}
 	}
-	if(i!=0){
-		fileName[i++]='.';
-		fileName[i++]='2';
-		fileName[i++]='0';
-		fileName[i++]='4';
-		fileName[i++]='8';
-		fileName[i++]='d';
-		fileName[i++]='a';
-		fileName[i++]='t';
-	}
+
 	fileName[i]=0;
 }
 
@@ -306,6 +299,9 @@ void ImprimirError(int error){
 		break;
 		case ERR_SAVE:
 			printf("\n\n** Se ha producido un error al intentar guardar la partida **\n\n");
+		break;
+		case ERR_FILE_VALID:
+			printf("\n\n** El archivo cargado no tiene un formato valido **\n\n");
 		break;
 	}
 }

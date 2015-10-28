@@ -1,5 +1,28 @@
 #include "2048back.h"
 
+
+static int creoTablero (sTablero * tablero, int dim, int undos, int ganador);
+static int creoCasvacios (sCasVacios * casVacios, int dim);
+static int randInt(int inicio, int final);
+static int nuevaFicha();
+static int buscoCasillero(sCasVacios vacios, int * posI, int *posJ);
+static void pongoFicha(sTablero * nuevo, sCasVacios * vacios);
+static int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVacios * vacios);
+static void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim);
+static int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * vacios);
+static void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux);
+static void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux);
+static void movimientosValidos(sTablero tablero1, int movimientos[]);
+static int fperdi(const int movimientos[], sTablero tablero);
+static int casilleroValido(int val, int numGanador);
+static int validoPartida(sTablero tablero);
+
+/*
+** La funcion creoTablero crea una matriz dinamica de dim*dim que sera el tablero en si
+** y guarda en la estrucura el numero ganador,dimension e incializa el puntaje en 0 y 
+** la cantidad de undos correspondiente. En caso de no disponer de memoria suficiente
+** devuelve el error ERR_MEMORIA.
+*/
 int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     int i;
     tablero->puntaje=0;
@@ -18,6 +41,12 @@ int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     }
     return 0;
 }
+
+/*
+** La funcion creoCasVacios crea una matriz dinamica de 2x(dim*dim), que guarda
+** la posicion i y j de los espacios vacios del tablero. En un comienzo guarda todas
+** las posicones del tablero ya que estan todas vacias.
+*/
 
 int creoCasvacios (sCasVacios * casVacios, int dim){//matriz de tamaño #casilleros por 2
 	int i,j,h=0;
@@ -41,13 +70,16 @@ int creoCasvacios (sCasVacios * casVacios, int dim){//matriz de tamaño #casille
     }
     return 0;
 }
-int randInt(int inicio, int final){//aleatorio entre inicio y final
+
+/* genera un aleatorio entre inicio y final*/
+int randInt(int inicio, int final){
 	int aux;
 	aux=rand()%(final+1)+inicio;
 	return aux;
 }
 
-int nuevaFicha(){//aleatorio 2 o 4
+/*genera el valor de la nueva ficha con 89% de probabilidad de ser un 2 y el resto 4*/
+int nuevaFicha(){
 	int aleatorio = randInt(1,100);
 	if(aleatorio<=89){
 		return 2;
@@ -55,51 +87,75 @@ int nuevaFicha(){//aleatorio 2 o 4
 		return 4;
 	}
 }
-
-int buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ // eligo un casillero vacio aleatorio en base a la matriz de casilleros vacios que le paso por parametro
+/* Elijo un casillero vacio aleatorio en base a la matriz de casilleros 
+** vacios que le paso por parametro y cargo en los parametros de salida
+** la posicion elejida i,j.
+*/
+int buscoCasillero(sCasVacios vacios, int * posI, int *posJ){ 
 	int aleatorio=randInt(0,(vacios.num)-1);
 
-	*posI=vacios.matriz[aleatorio][0];//devuelvo posicion elejida i,j
+	*posI=vacios.matriz[aleatorio][0];
 	*posJ=vacios.matriz[aleatorio][1];
 
 	return aleatorio;
 }
-
-void pongoFicha(sTablero * nuevo, sCasVacios * vacios){//agrego una nueva ficha aleatoria al tablero
+/*
+** La funcion pongoFicha llama a las funciones nuevaFicha y buscoCasillero y de acuerdo
+** a los valores obtenidos coloca la ficha en la posicion del tablero. Luego intercambia
+** los valores de la matriz de casilleros vacios obtenidos con el ultimo y decrementa el 
+** valor guardado del tamaño de la misma. No se borra la posicion usada para luego poder
+** realizar undo y volover a tener disponible el casillero utilizado.
+*/
+void pongoFicha(sTablero * nuevo, sCasVacios * vacios){
 	int i,j,pos,ficha=nuevaFicha(),aux[2];
 	pos=buscoCasillero(*vacios,&i,&j);
 	nuevo->matriz[i][j]=ficha;
-	//borro posicion vacia usada
-    vacios->matriz[pos][0]=aux[0]; /*En vez de correr todos intercambio el ultimo con el que use y despues achico la dimension del vector*/
+    vacios->matriz[pos][0]=aux[0];
     vacios->matriz[pos][1]=aux[1];
     vacios->matriz[pos][0]=vacios->matriz[vacios->num-1][0];
     vacios->matriz[pos][1]=vacios->matriz[vacios->num-1][1];
     vacios->matriz[vacios->num-1][0]=aux[0];
     vacios->matriz[vacios->num-1][1]=aux[1];
 	(vacios->num)--;
-	/*for(;pos<(vacios->num);pos++){
-		vacios->matriz[pos][0]=vacios->matriz[pos+1][0];
-		vacios->matriz[pos][1]=vacios->matriz[pos+1][1];
-	}*/
 }
 
+/*
+** La funcion se encarga de mover y sumar los elemetos de una linea en la direccion
+** ingresada por el usuario. Recibe por parametros las direcciones de movimiento
+** que seran desde donde inicia hasta donde termina, y en que sentido se desplazara
+** (el incremento). A medida que recorre la linea, saltea las posciones que contienen
+** vacios (0), copia los valores distintas de 0 en la matriz nueva, y posteriormente 
+** verifica si el numero exacamente pegado en la direccion del movimiento es igual a si
+** mismo. Si no son iguales saltea al proximo casillero, y de ser iguales verifica si 
+** en la copia anterior se realizo una suma. De haber una suma realizada, no se suman los
+** casilleros, y sino estos se suman. Luego de realizar una suma verifico que el numero
+** obtenido sea el numero establecido como ganador, y sumo al puntaje que tenia.
+** Si gane termino la ejecucion, sino continuo al siguiente casillero.
+** Al terminar de recorrer la linea, compĺeto con 0 al final, indicando que seran casilleros
+** vacios. Y voy guardando estos casilleros en la matriz de casilleros vacios.
+** Devuelvo si gane o no.
+*/
 
 int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVacios * vacios){
 
     int i,j,k=I.inicio, h=J.inicio, sume=0, gane=0;
-
-    for( i=I.inicio, j=J.inicio; i!=I.final && j!=J.final; i+=I.incremento, j+=J.incremento ){//recorro la fila o la columna dependiendo de los paramentros
-        
-        if(m.matriz[i][j]!=0){//salteo casilleros vacios
-            
-            nueva->matriz[k][h]=m.matriz[i][j];//copio los casilleros llenos a la matriz nueva
-            /*voy a fijarme si el numero que acabo de copiar se deberia sumar para combinar con el anterior de la fila-columna */
+    /*recorro la fila o la columna dependiendo de los paramentros*/
+    for( i=I.inicio, j=J.inicio; i!=I.final && j!=J.final; i+=I.incremento, j+=J.incremento ){
+        /*salteo casilleros vacios*/
+        if(m.matriz[i][j]!=0){
+            /*copio los casilleros llenos a la matriz nueva*/
+            nueva->matriz[k][h]=m.matriz[i][j];
+            /*me fijo si el numero que acabo de copiar se deberia sumar
+            **para combinar con el anterior de la fila-columna */
             if( (k!=I.inicio || h!=J.inicio) && !sume && nueva->matriz[k][h]==nueva->matriz[k-I.incremento][h-J.incremento]){//si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico si el numero es igual al casillero anterior
-                
-                nueva->matriz[k-I.incremento][h-J.incremento]*=2;//casillero anterior por 2
-                nueva->matriz[k][h]=0;//casillero actual vacio
-                sume=1;//aviso que la proxima pasada no tengo que sumar
-                /*IMPORTANTE no muevo el contador de la matriz nueva para volver al casillero que vacie*/
+                /*entro en la suma*/
+
+                nueva->matriz[k-I.incremento][h-J.incremento]*=2;/*casillero anterior x2*/
+                nueva->matriz[k][h]=0;/*casillero actual vacio*/
+                sume=1;/*aviso que la proxima pasada no tengo que sumar*/
+
+                /*IMPORTANTE no muevo el contador de la matriz nueva
+                **para en la proxima pasada volver al casillero que vacie*/
 
                 /*sumo puntaje*/
                 nueva->puntaje+=nueva->matriz[k-I.incremento][h-J.incremento];
@@ -110,18 +166,19 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVac
                 }
 
 
-            }else{
-                sume=0;//aviso que puedo sumar la proxima pasada
+            }else{/*si no sume*/
+                sume=0;/*aviso que puedo sumar la proxima pasada*/
                 k+=I.incremento;
                 h+=J.incremento;
-                /*si no sume si incremento los contadores de la matriz nueva*/
+                /*incremento los contadores de la matriz nueva*/
             }
         }
     }
-    for( ; k!=I.final && h!=J.final; k+=I.incremento, h+=J.incremento ){//relleno con 0 al final de la fila-columna
+    /*relleno con 0 al final de la fila-columna*/
+    for( ; k!=I.final && h!=J.final; k+=I.incremento, h+=J.incremento ){
         nueva->matriz[k][h]=0;
 
-        /*guardo los casilleros vacios*/
+        /*guardo los casilleros vacios en la matriz de casilleros vacios*/
         vacios->matriz[vacios->num][0]=k;
         vacios->matriz[(vacios->num)++][1]=h;
     }
@@ -231,7 +288,7 @@ void movimientosValidos(sTablero tablero1, int movimientos[]){
 	}
 }
 
-int fperdi(int movimientos[], sTablero tablero){
+int fperdi(const int movimientos[], sTablero tablero){
 	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0 && tablero.undos==0){
         return 1;
 	}else{
@@ -268,9 +325,9 @@ int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios
             }
             break;
         case DIFICIL:
-            error=creoTablero(tablero1,4,3,2048);
+            error=creoTablero(tablero1,4,2,2048);
             if(error==0){
-                error=creoTablero(tablero2,4,3,2048);
+                error=creoTablero(tablero2,4,2,2048);
             }
             if(error==0){
                 error=creoCasvacios(casVacios,4);
@@ -331,7 +388,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
     return error;
 }
 
-int guardar(char fileName[], sTablero tablero){
+int guardar(const char fileName[], sTablero tablero){
    FILE * archivo;
    unsigned short int dificultad,i,j;
    if(tablero.dim==8){
@@ -360,7 +417,51 @@ int guardar(char fileName[], sTablero tablero){
 
    return 0;
 }
-int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], char fileName[]){
+
+/*
+*Esta funcion valida que el valor ingresado como paramaetro
+*sea una potencia de 2, y que se encuentre entre 0 y el numero ganador.
+*en caso de no ser valido devuelve la variable simbolica ERR_FILE_VALID
+*sino devuelve 0
+*/
+int casilleroValido(int val, int numGanador){
+    if(val==1){
+        return ERR_FILE_VALID;
+    }
+    if(val>=0 && val<numGanador){
+        while(val>1){
+            if(val%2==0){
+                val/=2;
+            }else{
+                return ERR_FILE_VALID;
+            }
+        }
+    }else{
+        return ERR_FILE_VALID;
+    }
+    return 0;
+}
+
+int validoPartida(sTablero tablero){
+    int i,j,error=0;
+    if(tablero.puntaje<0 || tablero.puntaje%2==1){//valido puntaje
+        error=ERR_FILE_VALID;
+    }
+    if(!error && tablero.dim==8 && (tablero.undos>8 || tablero.undos<0)){//valido undos
+        error=ERR_FILE_VALID;
+    }else if(!error && tablero.dim==6 && (tablero.undos>4 || tablero.undos<0)){
+        error=ERR_FILE_VALID;
+    }else if(!error && tablero.dim==4 && (tablero.undos>2 || tablero.undos<0)){
+        error=ERR_FILE_VALID;
+    }
+    for(i=0;i<tablero.dim && !error;i++){
+        for(j=0;j<tablero.dim && !error;j++){
+            error=casilleroValido(tablero.matriz[i][j],tablero.numGanador);
+        }
+    }
+    return error;
+}
+int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], const char fileName[]){
     int error=0;
     FILE * archivo;
     unsigned short int dificultad,dim,puntaje,val,i,j;
@@ -377,8 +478,10 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
         dificultad=FACIL;
     }else if(dificultad==2){
         dificultad=INTERMEDIO;
-    }else{
+    }else if(dificultad==3){
         dificultad=DIFICIL;
+    }else{
+        return ERR_FILE_VALID;
     }
 
     error=creoEntorno(tablero1,tablero2,casVacios,dificultad);//creo los tableros
@@ -393,6 +496,11 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
         //for(j=0;j<(tablero1->dim);j++){
             fread((tablero1->matriz[i]),sizeof(tablero1->matriz[0][0]),tablero1->dim,archivo);
         //}
+    }
+
+    error=validoPartida(*tablero1);
+    if(error!=0){
+        return error;
     }
 
     movimientosValidos(*tablero1, movimientos);
