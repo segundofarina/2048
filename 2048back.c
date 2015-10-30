@@ -3,6 +3,7 @@
 
 static int creoTablero (sTablero * tablero, int dim, int undos, int ganador);
 static int creoCasvacios (sCasVacios * casVacios, int dim);
+static int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad);
 static int randInt(int inicio, int final);
 static int nuevaFicha();
 static int buscoCasillero(sCasVacios vacios, int * posI, int *posJ);
@@ -119,10 +120,10 @@ int buscoCasillero(sCasVacios vacios, int * posI, int *posJ){
 ** valor guardado del tamaño de la misma. No se borra la posicion usada para luego poder
 ** realizar undo y volover a tener disponible el casillero utilizado.
 */
-void pongoFicha(sTablero * nuevo, sCasVacios * vacios){
+void pongoFicha(sTablero * tablero, sCasVacios * vacios){
 	int i,j,pos,ficha=nuevaFicha(),aux[2];
 	pos=buscoCasillero(*vacios,&i,&j);
-	nuevo->matriz[i][j]=ficha;
+	tablero->matriz[i][j]=ficha;
     vacios->matriz[pos][0]=aux[0];
     vacios->matriz[pos][1]=aux[1];
     vacios->matriz[pos][0]=vacios->matriz[vacios->num-1][0];
@@ -149,22 +150,22 @@ void pongoFicha(sTablero * nuevo, sCasVacios * vacios){
 ** vacios. Y voy guardando estos casilleros en la matriz de casilleros vacios.
 ** Devuelvo si gane o no.
 */
-int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVacios * vacios){
+int sumoFila(sMovimiento I, sMovimiento J, sTablero tablero1, sTablero * tablero2, sCasVacios * vacios){
 
     int i,j,k=I.inicio, h=J.inicio, sume=0, gane=0;
     /* Recorro la fila o la columna dependiendo de los paramentros */
     for( i=I.inicio, j=J.inicio; i!=I.final && j!=J.final; i+=I.incremento, j+=J.incremento ){
         /* Salteo casilleros vacios */
-        if(m.matriz[i][j]!=0){
+        if(tablero1.matriz[i][j]!=0){
             /* Copio los casilleros llenos a la matriz nueva */
-            nueva->matriz[k][h]=m.matriz[i][j];
+            tablero2->matriz[k][h]=tablero1.matriz[i][j];
             /* Me fijo si el numero que acabo de copiar se deberia sumar
             ** para combinar con el anterior de la fila-columna */
-            if( (k!=I.inicio || h!=J.inicio) && !sume && nueva->matriz[k][h]==nueva->matriz[k-I.incremento][h-J.incremento]){//si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico si el numero es igual al casillero anterior
+            if( (k!=I.inicio || h!=J.inicio) && !sume && tablero2->matriz[k][h]==tablero2->matriz[k-I.incremento][h-J.incremento]){//si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico si el numero es igual al casillero anterior
                 /* Entro en la suma */
 
-                nueva->matriz[k-I.incremento][h-J.incremento]*=2;/* Casillero anterior x2 */
-                nueva->matriz[k][h]=0;/* Casillero actual vacio */
+                tablero2->matriz[k-I.incremento][h-J.incremento]*=2;/* Casillero anterior x2 */
+                tablero2->matriz[k][h]=0;/* Casillero actual vacio */
                 sume=1;/* Aviso que la proxima pasada no tengo que sumar */
 
                 /* 
@@ -173,10 +174,10 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVac
                 */
 
                 /* Sumo puntaje */
-                nueva->puntaje+=nueva->matriz[k-I.incremento][h-J.incremento];
+                tablero2->puntaje+=tablero2->matriz[k-I.incremento][h-J.incremento];
 
                 /* Verifico si gane */
-                if(nueva->matriz[k-I.incremento][h-J.incremento]==nueva->numGanador){
+                if(tablero2->matriz[k-I.incremento][h-J.incremento]==tablero2->numGanador){
                 	gane=1;
                 }
 
@@ -191,7 +192,7 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVac
     }
     /* Relleno con 0 al final de la fila-columna */
     for( ; k!=I.final && h!=J.final; k+=I.incremento, h+=J.incremento ){
-        nueva->matriz[k][h]=0;
+        tablero2->matriz[k][h]=0;
 
         /* Guardo los casilleros vacios en la matriz de casilleros vacios */
         vacios->matriz[vacios->num][0]=k;
@@ -241,25 +242,26 @@ void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim
 
 
 /* Indica como se debe mover cada linea de la matriz */
-int muevoTablero(int direccion, sTablero viejo, sTablero * nuevo, sCasVacios * vacios){
+int muevoTablero(int direccion, sTablero tablero1, sTablero * tablero2, sCasVacios * casVacios){
     /* Creo los dos sentidos de movimiento y recorro la matriz llamando a la funcion
     ** que suma las filas en sentido opuesto a la direccion. */
     sMovimiento I,J;
-    int gane=0;
+    int gane=SIGO;
 
-    descifroMovimiento(direccion,&I,&J,viejo.dim);
+    descifroMovimiento(direccion,&I,&J,tablero1.dim);
 
-    nuevo->puntaje=viejo.puntaje;
+    tablero2->puntaje=tablero1.puntaje;
 
-    vacios->num=0;/* Inicializo el contador de la matriz que guarda los vacios */
+    casVacios->num=0;/* Inicializo el contador de la matriz que guarda los vacios */
 
     for ( ; I.inicio!=I.final && J.inicio!=J.final; I.inicio+=abs(J.incremento), J.inicio+=abs(I.incremento) )
     {
-        if(sumoFila(I,J,viejo,nuevo,vacios)){
-        	gane=1;
+        if(sumoFila(I,J,tablero1,tablero2,casVacios)){
+        	gane=GANE;
         }
 
     }
+
     return gane;
 }
 
@@ -324,9 +326,9 @@ void movimientosValidos(sTablero tablero1, int movimientos[]){
 /* Si no hay movimientos validos en ninguna dirrecion y no tengo mas undos devulve 1 */
 int fperdi(const int movimientos[], sTablero tablero){
 	if(movimientos[0]==0 && movimientos[1]==0 && movimientos[2]==0 && movimientos[3]==0 && tablero.undos==0){
-        	return 1;
+        return PERDI;
 	}else{
-		return 0;
+		return SIGO;
 	}
 }
 
@@ -400,7 +402,7 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
 ** Llama a las subfunciones que se encargan de realizar la jugada, devuelve si hubo un error y deja
 ** en parametros de salida si se gano o perdio la partida.
 */
-int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion){
+int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * estado,int movimientos[], int accion){
     int error=0;
         if(accion==UNDO){
             if(tablero1->undos>0 && !*hiceUndo){
@@ -414,12 +416,14 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
             }
         }else if(accion==IZQUIERDA || accion==ARRIBA || accion==DERECHA || accion==ABAJO){/* Si es movimiento valido */
             if(movimientos[accion-1]!=0){
-                *gane = muevoTablero(accion,*tablero1,tablero2,casVacios);
+                *estado = muevoTablero(accion,*tablero1,tablero2,casVacios);
                 swapTableros (tablero1, tablero2, tableroAux);
                 pongoFicha (tablero1,casVacios);
                 *hiceUndo=0;
                 movimientosValidos(*tablero1, movimientos);
-                *perdi=fperdi(movimientos, *tablero1);
+                if(*estado==SIGO){
+                    *estado=fperdi(movimientos, *tablero1);
+                }
             }
             else if (movimientos[IZQUIERDA-1]==0&& movimientos[ARRIBA-1]==0&& movimientos[DERECHA-1]==0&& movimientos[ABAJO-1]==0&& tablero1->undos!=0){
                 error=ERR_FORZADO;
@@ -433,7 +437,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
 /* Guarada la partida en un archivo en el siguente orden: dificultad,puntaje,undos y fichas del tablero */
 int guardar(const char fileName[], sTablero tablero){
    FILE * archivo;
-   unsigned short int dificultad,i,j;
+   unsigned short int dificultad,i;
    if(tablero.dim==8){
        dificultad=1;
    }else if(tablero.dim==6){
@@ -517,7 +521,7 @@ int validoPartida(sTablero tablero){
 int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], const char fileName[]){
     int error=0;
     FILE * archivo;
-    unsigned short int dificultad,dim,puntaje,val,i,j;
+    unsigned short int dificultad,i;
 
     archivo=fopen(fileName,"r");
     if(archivo==NULL){
@@ -561,14 +565,14 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
 }
 
 void liberoPartida(sTablero tablero1,sTablero tablero2,sCasVacios casVacios){
-    int i,j;
+    int i;
     for (i=0;i<tablero1.dim; i++){
         free(tablero1.matriz[i]);
         free(tablero2.matriz[i]);
     }
     free(tablero1.matriz);
     free(tablero2.matriz);
-    for (i = 0; i <2; i++){
+    for (i=0;i<2; i++){
         free(casVacios.matriz[i]);
     }
     free(casVacios.matriz);

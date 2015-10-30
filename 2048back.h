@@ -14,6 +14,10 @@
 #define INTERMEDIO 5
 #define DIFICIL 6
 
+#define GANE 1
+#define PERDI 0
+#define SIGO 3
+
 
 /*
 **Defino variables simbolicas con numeros negativos comenzando del -100 para indicar
@@ -79,7 +83,7 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
 /*
 ** Jugar controla el flujo del juego, realizando la accion ingresada por el usuario. 
 */
-int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * gane, int * perdi,int movimientos[], int accion);
+int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * estado,int movimientos[], int accion);
 
 /*
 ** La funcion guardar almacena la partida en el archivo pasado por parametro

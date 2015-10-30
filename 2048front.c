@@ -31,7 +31,7 @@ void ImprimirError(int error);
 
 int main(){
 	srand(time(NULL));
-	int menuOption, resp,accion,jugada,direccion,hiceUndo=1,gane=0,perdi=0,error;
+	int menuOption, resp,accion,jugada,hiceUndo=1,estado,error;
 	sTablero tablero1, tablero2, tableroAux;
 	sCasVacios casVacios;
 	int movimientos[4];
@@ -43,6 +43,7 @@ int main(){
 	/* Me quedo en el menu hasta opcion de salir */
 	do{
 		accion=0;/*inicializo accion para evitar errores en segunda pasada*/
+		estado=SIGO;
 		menuOption=menu();
 
 		/* valores iniciales del talblero dependen de la opcion elegida */
@@ -77,8 +78,8 @@ int main(){
 		}
 
 		/* me quedo jugando en la partida */
-		while(menuOption!=END && !gane && !perdi && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
-			jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion);
+		while(menuOption!=END && estado==SIGO && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
+			jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&estado,movimientos,accion);
 			if(jugada==NOHAYERROR){
 			    ImprimirTablero(tablero1);
 			}else{
@@ -87,11 +88,11 @@ int main(){
 		}	
 		
 		/* termine la partida, informo estado en que termine*/
-		if(gane){
+		if(estado==GANE){
 			printf("\n\n********** Felicitaciones has ganado!!! **********\n");
 			printf("**********     Tu puntuacion fue: %d    **********\n\n",tablero1.puntaje);
 			liberoPartida(tablero1,tablero2,casVacios);
-		}else if (perdi){
+		}else if (estado==PERDI){
 	        printf("\n\n********** Lo lamento has perdido! **********\n");
 	        printf("**********  Tu puntuacion fue: %d  **********\n\n",tablero1.puntaje);
 	        liberoPartida(tablero1,tablero2,casVacios);
