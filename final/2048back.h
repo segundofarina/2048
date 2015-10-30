@@ -1,3 +1,7 @@
+#ifndef _2048_header
+
+#define _2048_header
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -101,3 +105,5 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
 ** liberoPartida libera los elementos dinamicos una vez terminada la partida
 */
 void liberoPartida(sTablero tablero1,sTablero tablero2,sCasVacios casVacios);
+
+#endif
