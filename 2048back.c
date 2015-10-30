@@ -186,7 +186,6 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero m, sTablero * nueva, sCasVac
 }
 /*Guarda en la estrcura de movimento como debe recorrese la matriz*/
 void descifroMovimiento (int direccion, sMovimiento * I, sMovimiento * J,int dim){
-
     switch(direccion){
         case IZQUIERDA:
             I->inicio=0;

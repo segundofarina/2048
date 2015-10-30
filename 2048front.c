@@ -2,6 +2,8 @@
 #include <time.h>
 #include "2048back.h"
 
+#define LOAD 2
+#define END 3
 #define QUIT 6
 #define SAVE 7
 
@@ -11,23 +13,14 @@
 
 
 void presentacion();
-
 int menu();
-
 int dificultad();
-
 int pedirJugada(char fileName[]);
-
 void getAccion(char comando[], char fileName[]);
-
 int getsn();
-
 int preguntoSave();
-
 void preguntoFileName(char fileName[]);
-
 void ImprimirTablero(sTablero tablero);
-
 void ImprimirError(int error);
 
 
@@ -44,7 +37,7 @@ int main(){
 	resp=menu();
 	
 	switch(resp){
-		case 2://cargo partida guradada
+		case LOAD:/*cargo partida guradada*/
 			preguntoFileName(fileName);
 			error=cargoPartida(&tablero1,&tablero2,&casVacios,movimientos,fileName);
 			if(error==ERR_MEMORIA){
@@ -56,14 +49,14 @@ int main(){
 			}
 			else if(error==ERR_FILE_VALID){
 				ImprimirError(ERR_FILE_VALID);
-				//return 1;
+				return 1;
 			}
 			ImprimirTablero(tablero1);
 		break;
-		case 3:
+		case END:
 			return 0;
 		break;
-		case 4:case 5: case 6:
+		case FACIL:case INTERMEDIO: case DIFICIL:
 			error=inicializo(&tablero1,&tablero2,&casVacios,resp,movimientos);
 			if(error==ERR_MEMORIA){
 				ImprimirError(ERR_MEMORIA);
@@ -125,6 +118,7 @@ int main(){
 
 }
 
+/* Cartel de inicio del juego */
 void presentacion(){
 	printf("\n\n\n");
 	printf("***********************************\n");
@@ -134,6 +128,7 @@ void presentacion(){
 	printf("***********************************\n\n");
 }
 
+/* Presento el menu principal y valido que se ingrese una opcion correcta */
 int menu(){
 	int resp;
 	printf("1-Juego nuevo\n");
@@ -150,6 +145,7 @@ int menu(){
 	return resp;
 }
 
+/* Pido al usuario la dificultad de la partida  y la valido */
 int dificultad(){
 	int resp;
 	printf("\nELIJA UNA DIFICULTAD:\n");
@@ -164,6 +160,8 @@ int dificultad(){
 	return resp;
 }
 
+/* Decodifico el comando ingreado por el usuario a las aciones 
+** que realiza el juego */
 int pedirJugada(char fileName[]){
 	char comando[MAX_LENGTH_COMANDO];
 	int resp=-1;
@@ -192,6 +190,8 @@ int pedirJugada(char fileName[]){
 	return resp;
 }
 
+/* Le pido al jugador que ingrese un comando y si es save
+** guardo el nombre del archivo en un string */
 void getAccion(char comando[], char fileName[]){
 	char c;
 	int i=0,j=0,var=1;
@@ -210,6 +210,7 @@ void getAccion(char comando[], char fileName[]){
 	fileName[j]=0;
 }
 
+/* Pregunto si/no */
 int getsn(){
 	char c,sn=0;
 	while((c=getchar())!='\n'){
@@ -227,6 +228,8 @@ int getsn(){
 	}
 }
 
+/* Funcion ejecutada previo a terminar la partida 
+** presenta opcion de save al poner el comando "quit" */
 int preguntoSave(){
 	int resp;
 	printf("Desea guradar la partida?(s/n)\n");
@@ -236,6 +239,7 @@ int preguntoSave(){
 	return resp;
 }
 
+/* Pido solo el nombre del archivo y lo almaneno en un string */
 void preguntoFileName(char fileName[]){
 	char c;
 	int i=0;
@@ -249,6 +253,7 @@ void preguntoFileName(char fileName[]){
 	fileName[i]=0;
 }
 
+/* Imprimo tablero con formato acorde a la dimencion del tablero */
 void ImprimirTablero(sTablero tablero){
     int i,j;
     printf("PUNTAJE:%d\n",tablero.puntaje);
@@ -280,6 +285,7 @@ void ImprimirTablero(sTablero tablero){
     printf("\n");
 }
 
+/* Decodifico errores devueltos por el back-end e informo al usuraio del mimso */
 void ImprimirError(int error){
 	switch(error){
 		case ERR_UNDO:
