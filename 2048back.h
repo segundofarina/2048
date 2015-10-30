@@ -21,7 +21,6 @@
 */
 #define ERR_UNDO -100       /*El jugador se ha quedado sin undos para realizar
                             **o realizo un undo en la jugaad anterior*/
-#define ERR_MOV -99         /*No exsiten movimientos en la direccion ingresada*/
 #define ERR_FORZADO -98     /* No existen movimientos en ninguna direccion y solo se
                             **pueden realizar undos*/
 #define ERR_MEMORIA -97     /*No hay memoria suficiente para inicializar la partida*/
@@ -93,3 +92,8 @@ int guardar(const char fileName[], sTablero tablero);
 ** con la informacion del archivo. 
 */
 int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[],const char fileName[]);
+
+/*
+** liberoPartida libera los elementos dinamicos una vez terminada la partida
+*/
+void liberoPartida(sTablero tablero1,sTablero tablero2,sCasVacios casVacios);

@@ -25,7 +25,7 @@ static int validoPartida(sTablero tablero);
 ** devuelve el error ERR_MEMORIA.
 */
 int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
-    int i;
+    int i,j;
     tablero->puntaje=0;
     tablero->undos=undos;
     tablero->numGanador=ganador;
@@ -37,6 +37,10 @@ int creoTablero (sTablero * tablero, int dim, int undos, int ganador){
     for(i=0;i<tablero->dim; i++){
         tablero->matriz[i]=calloc(tablero->dim,sizeof(unsigned short int));
         if (tablero->matriz[i] == NULL){
+            for(j=0; j<i; j++){
+                free(tablero->matriz[i]);
+            }
+            free(tablero->matriz);
             return ERR_MEMORIA;
         }
     }
@@ -59,6 +63,7 @@ int creoCasvacios (sCasVacios * casVacios, int dim){//matriz de tamaño #casille
 	for(i=0;i<dim*dim; i++){
         casVacios->matriz[i]= malloc(2*sizeof(int ));
         if (casVacios->matriz[i] == NULL){
+            free(casVacios->matriz);
             return ERR_MEMORIA;
         }
     }
@@ -420,10 +425,6 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
                 error=ERR_FORZADO;
             }
 
-            else{
-                error=ERR_MOV;
-            }
-
         }
     return error;
 }
@@ -557,4 +558,18 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
 
     return 0;
 
+}
+
+void liberoPartida(sTablero tablero1,sTablero tablero2,sCasVacios casVacios){
+    int i,j;
+    for (i=0;i<tablero1.dim; i++){
+        free(tablero1.matriz[i]);
+        free(tablero2.matriz[i]);
+    }
+    free(tablero1.matriz);
+    free(tablero2.matriz);
+    for (i = 0; i <2; i++){
+        free(casVacios.matriz[i]);
+    }
+    free(casVacios.matriz);
 }

@@ -90,10 +90,12 @@ int main(){
 		if(gane){
 			printf("\n\n********** Felicitaciones has ganado!!! **********\n");
 			printf("**********     Tu puntuacion fue: %d    **********\n\n",tablero1.puntaje);
+			liberoPartida(tablero1,tablero2,casVacios);
 		}else if (perdi){
 	        printf("\n\n********** Lo lamento has perdido! **********\n");
 	        printf("**********  Tu puntuacion fue: %d  **********\n\n",tablero1.puntaje);
-	    }else if(accion==QUIT){printf("accion es %d\n", accion);
+	        liberoPartida(tablero1,tablero2,casVacios);
+	    }else if(accion==QUIT){
 	    	resp = preguntoSave();
 	    	if(resp==SI){
 	    		/*guardo*/
@@ -105,7 +107,7 @@ int main(){
 	    			ImprimirError(ERR_SAVE);
 	    		}
 	    	}
-
+	    	liberoPartida(tablero1,tablero2,casVacios);
 	    }else if(accion==SAVE){
 	    	/*guardo*/
 	    	if (fileName[0]==0){
@@ -117,12 +119,13 @@ int main(){
 			}else{
 				ImprimirError(ERR_SAVE);
 			}
+			liberoPartida(tablero1,tablero2,casVacios);
 	    }else if(menuOption==END){
 	    	printf("\n\n *************** Gracias por juagar al 2048 ***************\n\n");
 	    }else{
 	    	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
+	    	return 1;
 	    }
-
 
 	}while(menuOption!=END);
 
@@ -146,6 +149,7 @@ void presentacion(){
 /* Presento el menu principal y valido que se ingrese una opcion correcta */
 int menu(){
 	int resp;
+	printf("\n\n\n");
 	printf("1-Juego nuevo\n");
 	printf("2-Recuperar un juego guardado\n");
 	printf("3-Salir\n");
@@ -264,7 +268,6 @@ void preguntoFileName(char fileName[]){
 			fileName[i++]=c;
 		}
 	}
-
 	fileName[i]=0;
 }
 
@@ -305,9 +308,6 @@ void ImprimirError(int error){
 	switch(error){
 		case ERR_UNDO:
 			printf("\n** No puedes realizar undo **\n\n");
-		break;
-		case ERR_MOV:
-			printf("\n** Movimiento invalido **\n\n");
 		break;
 		case ERR_FORZADO:
 			printf("\n** No hay movimientos posibles.Realizar undo **\n\n");
