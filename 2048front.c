@@ -195,7 +195,7 @@ int pedirJugada(char fileName[]){
 			resp=UNDO;
 		}else if(!strcmp(comando,"quit")){
 			resp=QUIT;
-		}else if(!strcmp(comando,"save")){//modificar
+		}else if(!strcmp(comando,"save")){
 			resp=SAVE;
 		}else{
 			printf("** Comando no valido. **\n");
@@ -238,7 +238,7 @@ int getsn(){
 	}else if(sn=='n'){
 		return NO;
 	}else{
-		//error
+		/* Error */
 		return -1;
 	}
 }
@@ -248,7 +248,7 @@ int getsn(){
 int preguntoSave(){
 	int resp;
 	printf("Desea guradar la partida?(s/n)\n");
-	while((resp=getsn())==-1){//valido s o n
+	while((resp=getsn())==-1){/* Valido s/n */
 		printf("Comando no valido (s/n)\n");
 	}
 	return resp;
