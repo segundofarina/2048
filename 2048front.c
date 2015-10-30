@@ -10,6 +10,10 @@
 #define MAX_LENGTH_COMANDO 5
 #define MAX_LENGTH_FILE_NAME 36
 
+#define SI 1
+#define NO 0
+#define NOHAYERROR 0
+
 
 
 void presentacion();
@@ -27,91 +31,102 @@ void ImprimirError(int error);
 
 int main(){
 	srand(time(NULL));
-	int resp,accion,jugada,direccion,hiceUndo=1,gane=0,perdi=0,error;
+	int menuOption, resp,accion,jugada,direccion,hiceUndo=1,gane=0,perdi=0,error;
 	sTablero tablero1, tablero2, tableroAux;
 	sCasVacios casVacios;
 	int movimientos[4];
 	char fileName[MAX_LENGTH_FILE_NAME];
 
 	presentacion();
-	resp=menu();
-	
-	switch(resp){
-		case LOAD:/*cargo partida guradada*/
-			preguntoFileName(fileName);
-			error=cargoPartida(&tablero1,&tablero2,&casVacios,movimientos,fileName);
-			if(error==ERR_MEMORIA){
-				ImprimirError(ERR_MEMORIA);
-				return 1;
-			}else if(error==ERR_FILE){
-				ImprimirError(ERR_FILE);
-				return 1;
-			}
-			else if(error==ERR_FILE_VALID){
-				ImprimirError(ERR_FILE_VALID);
-				return 1;
-			}
-			ImprimirTablero(tablero1);
-		break;
-		case END:
-			return 0;
-		break;
-		case FACIL:case INTERMEDIO: case DIFICIL:
-			error=inicializo(&tablero1,&tablero2,&casVacios,resp,movimientos);
-			if(error==ERR_MEMORIA){
-				ImprimirError(ERR_MEMORIA);
-				return 1;
-			}
-			ImprimirTablero(tablero1);
-		break;
 
-	}
 
-	while(!gane && !perdi && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
-		jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion);
-		if(jugada==0){
-		    ImprimirTablero(tablero1);
-		}else{
-			ImprimirError(jugada);
+	/* Me quedo en el menu hasta opcion de salir */
+	do{
+		accion=0;/*inicializo accion para evitar errores en segunda pasada*/
+		menuOption=menu();
+
+		/* valores iniciales del talblero dependen de la opcion elegida */
+		switch(menuOption){
+			case LOAD:/*cargo partida guradada*/
+				preguntoFileName(fileName);
+				error=cargoPartida(&tablero1,&tablero2,&casVacios,movimientos,fileName);
+				if(error==ERR_MEMORIA){
+					ImprimirError(ERR_MEMORIA);
+					return 1;
+				}else if(error==ERR_FILE){
+					ImprimirError(ERR_FILE);
+					return 1;
+				}
+				else if(error==ERR_FILE_VALID){
+					ImprimirError(ERR_FILE_VALID);
+					return 1;
+				}
+				ImprimirTablero(tablero1);//cambiar
+			break;
+			case END:
+
+			break;
+			case FACIL:case INTERMEDIO: case DIFICIL:
+				error=inicializo(&tablero1,&tablero2,&casVacios,menuOption,movimientos);
+				if(error==ERR_MEMORIA){
+					ImprimirError(ERR_MEMORIA);
+					return 1;
+				}
+				ImprimirTablero(tablero1);
+			break;
 		}
-	}	
-	
-	if(gane){
-		printf("\n\n********** Felicitaciones has ganado!!! **********\n");
-		printf("**********     Tu puntuacion fue: %d    **********\n\n",tablero1.puntaje);
-	}else if (perdi){
-        printf("\n\n********** Lo lamento has perdido! **********\n");
-        printf("**********  Tu puntuacion fue: %d  **********\n\n",tablero1.puntaje);
-    }else if(accion==QUIT){
-    	resp = preguntoSave();
-    	if(resp==1){
-    		//guardo
-    		preguntoFileName(fileName);
-    		resp=guardar(fileName,tablero1);
-    		if(resp==0){
-    			printf("\n\n** La partida %s se guardo correctamente **\n\n", fileName);
-    		}else{
-    			ImprimirError(ERR_SAVE);
-    		}
-    	}else{
-    		return 0;//salgo
-    	}
 
-    }else if(accion==SAVE){
-    	//guardo
-    	if (fileName[0]==0){
-    		preguntoFileName(fileName);
-    	}
-    	resp=guardar(fileName,tablero1);
-		if(resp==0){
-			printf("\n\n** La partida %s se guardo correctamente **\n\n", fileName);
-		}else{
-			ImprimirError(ERR_SAVE);
-		}
-    }else{
-    	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
-    	return 1;
-    }
+		/* me quedo jugando en la partida */
+		while(menuOption!=END && !gane && !perdi && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
+			jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&gane,&perdi,movimientos,accion);
+			if(jugada==NOHAYERROR){
+			    ImprimirTablero(tablero1);
+			}else{
+				ImprimirError(jugada);
+			}
+		}	
+		
+		/* termine la partida, informo estado en que termine*/
+		if(gane){
+			printf("\n\n********** Felicitaciones has ganado!!! **********\n");
+			printf("**********     Tu puntuacion fue: %d    **********\n\n",tablero1.puntaje);
+		}else if (perdi){
+	        printf("\n\n********** Lo lamento has perdido! **********\n");
+	        printf("**********  Tu puntuacion fue: %d  **********\n\n",tablero1.puntaje);
+	    }else if(accion==QUIT){printf("accion es %d\n", accion);
+	    	resp = preguntoSave();
+	    	if(resp==SI){
+	    		/*guardo*/
+	    		preguntoFileName(fileName);
+	    		resp=guardar(fileName,tablero1);
+	    		if(resp==NOHAYERROR){
+	    			printf("\n\n** La partida %s se guardo correctamente **\n\n", fileName);
+	    		}else{
+	    			ImprimirError(ERR_SAVE);
+	    		}
+	    	}
+
+	    }else if(accion==SAVE){
+	    	/*guardo*/
+	    	if (fileName[0]==0){
+	    		preguntoFileName(fileName);
+	    	}
+	    	resp=guardar(fileName,tablero1);
+			if(resp==0){
+				printf("\n\n** La partida %s se guardo correctamente **\n\n", fileName);
+			}else{
+				ImprimirError(ERR_SAVE);
+			}
+	    }else if(menuOption==END){
+	    	printf("\n\n *************** Gracias por juagar al 2048 ***************\n\n");
+	    }else{
+	    	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
+	    }
+
+
+	}while(menuOption!=END);
+
+
 
 	return 0;
 
@@ -213,15 +228,15 @@ void getAccion(char comando[], char fileName[]){
 /* Pregunto si/no */
 int getsn(){
 	char c,sn=0;
-	while((c=getchar())!='\n'){
+	while((c=getchar())!='\n'){/* me quedo con el primer caracter y borro buffer*/
 		if(sn==0){
 			sn=c;
 		}
 	}
 	if(sn=='s'){
-		return 1;
+		return SI;
 	}else if(sn=='n'){
-		return 0;
+		return NO;
 	}else{
 		//error
 		return -1;
