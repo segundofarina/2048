@@ -31,7 +31,7 @@ void ImprimirError(int error);
 
 int main(){
 	srand(time(NULL));
-	int menuOption, resp,accion,jugada,hiceUndo=1,estado,error;
+	int menuOption, resp,accion,jugada,hiceUndo=1,estado,error=NO;
 	sTablero tablero1, tablero2, tableroAux;
 	sCasVacios casVacios;
 	int movimientos[4];
@@ -56,13 +56,12 @@ int main(){
 					return 1;
 				}else if(error==ERR_FILE){
 					ImprimirError(ERR_FILE);
-					return 1;
 				}
 				else if(error==ERR_FILE_VALID){
 					ImprimirError(ERR_FILE_VALID);
-					return 1;
+				}else{
+					ImprimirTablero(tablero1);	
 				}
-				ImprimirTablero(tablero1);//cambiar
 			break;
 			case END:
 
@@ -78,7 +77,7 @@ int main(){
 		}
 
 		/* me quedo jugando en la partida */
-		while(menuOption!=END && estado==SIGO && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
+		while(menuOption!=END && error==NO && estado==SIGO && (accion=pedirJugada(fileName))!=QUIT && accion!=SAVE){
 			jugada=jugar(&tablero1, &tablero2, &tableroAux,&casVacios ,&hiceUndo,&estado,movimientos,accion);
 			if(jugada==NOHAYERROR){
 			    ImprimirTablero(tablero1);
@@ -123,6 +122,8 @@ int main(){
 			liberoPartida(tablero1,tablero2,casVacios);
 	    }else if(menuOption==END){
 	    	printf("\n\n *************** Gracias por juagar al 2048 ***************\n\n");
+	    }else if(error==ERR_FILE || error==ERR_FILE_VALID){
+	    	/* vuelvo a mostrar el menu */
 	    }else{
 	    	printf("\n\n********** Oh Oh, Algo salio mal! **********\n\n");
 	    	return 1;
