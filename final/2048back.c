@@ -390,7 +390,7 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
     if(error!=0){
     	return error;
     }
-    pongoFicha (tablero1,casVacios);/* Agrego primer ficha */
+    pongoFicha (tablero1,casVacios);/* Agrego primera ficha */
     pongoFicha (tablero1,casVacios);/* Agrego segunda ficha */
 
     movimientosValidos(*tablero1, movimientos);
@@ -435,7 +435,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
 }
 
 
-/* Guarada la partida en un archivo en el siguente orden: dificultad,puntaje,undos y fichas del tablero */
+/* Guarada la partida en un archivo en el siguente orden: dificultad, puntaje, undos y fichas del tablero */
 int guardar(const char fileName[], sTablero tablero){
    FILE * archivo;
    unsigned short int dificultad,i;
@@ -470,7 +470,7 @@ int guardar(const char fileName[], sTablero tablero){
 /*
 *Esta funcion valida que el valor ingresado como paramaetro
 *sea una potencia de 2, y que se encuentre entre 0 y el numero ganador.
-*en caso de no ser valido devuelve la variable simbolica ERR_FILE_VALID
+*En caso de no ser valido devuelve la variable simbolica ERR_FILE_VALID
 *sino devuelve 0
 */
 int casilleroValido(int val, int numGanador){
