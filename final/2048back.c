@@ -136,15 +136,16 @@ void pongoFicha(sTablero * tablero, sCasVacios * vacios){
 
 /*
 ** La funcion se encarga de mover y sumar los elemetos de una linea en la direccion
-** ingresada por el usuario. Recibe por parametros las direcciones de movimiento
-** que seran desde donde inicia hasta donde termina, y en que sentido se desplazara
-** (el incremento). A medida que recorre la linea, saltea las posciones que contienen
-** vacios (0), copia los valores distintas de 0 en la matriz nueva, y posteriormente 
-** verifica si el numero exacamente pegado en la direccion del movimiento es igual a si
-** mismo. Si no son iguales saltea al proximo casillero, y de ser iguales verifica si 
-** en la copia anterior se realizo una suma. De haber una suma realizada, no se suman los
-** casilleros, y sino estos se suman. Luego de realizar una suma verifico que el numero
-** obtenido sea el numero establecido como ganador, y sumo al puntaje que tenia.
+** ingresada por el usuario. Recibe por parametros las direcciones de desplazamiento
+** que seran desde donde inicia hasta donde termina de depslazarse por la linea
+**, y en que sentido lo hará (el incremento). A medida que recorre la linea, saltea 
+** las posciones que contienen vacios (0), copia los valores distintos de 0 en la matriz
+** nueva, y posteriormente verifica si el numero exacamente pegado en la direccion del
+** desplazamiento es igual a si mismo. 
+** Si no son iguales saltea al proximo casillero, y de ser iguales verifica si en la 
+** copia anterior se realizo una suma. De haber una suma realizada, no se suman los
+** casilleros, y sino estos se suman. Luego de realizar una suma verifico si el numero
+** obtenido es igual al numero establecido como ganador, y sumo al puntaje que tenia.
 ** Si gane termino la ejecucion, sino continuo al siguiente casillero.
 ** Al terminar de recorrer la linea, compĺeto con 0 al final, indicando que seran casilleros
 ** vacios. Y voy guardando estos casilleros en la matriz de casilleros vacios.
@@ -274,7 +275,7 @@ void swapTableros (sTablero * tablero1, sTablero * tablero2, sTablero * aux){
 }
 
 
-/* Rota los tableros y decremento la cantidad de undos */
+/* Rota los tableros y decrementa la cantidad de undos */
 void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux){
 	swapTableros(tablero1, tablero2, aux);
 	(tablero1->undos)--;
@@ -282,7 +283,7 @@ void undo(sTablero * tablero1, sTablero * tablero2, sTablero * aux){
 }
 
 
-/* Alamcena en un vector movimentos 1 si el movimiento es valido en cada direccion o 0 en caso contrario */
+/* Alamcena en un vector movimentos "1" si el movimiento es valido en esa direccion o "0" en caso contrario */
 void movimientosValidos(sTablero tablero1, int movimientos[]){
 	int i,j;
 	movimientos[0]=0;
@@ -335,7 +336,7 @@ int fperdi(const int movimientos[], sTablero tablero){
 
 /*
 ** Dependiendo de la dificultad ingresada por parametero se crean dos tableros, y la estructura de 
-** casilleros vacios. Elprimer tablero alamcena la partida actual, el segundo tablero alamcena la
+** casilleros vacios. El primer tablero alamcena la partida actual, el segundo tablero alamcena la
 ** juagada anterior para luego poder realizar el undo.
 */
 int creoEntorno(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int dificultad){
@@ -517,7 +518,7 @@ int validoPartida(sTablero tablero){
 }
 
 
-/* Leo un archivo y lo valido. Creo el entorno de juego. */
+/* Lee un archivo y lo valido. Crea el entorno de juego. */
 int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios, int movimientos[], const char fileName[]){
     int error=0;
     FILE * archivo;
@@ -563,7 +564,7 @@ int cargoPartida(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacio
     return 0;
 
 }
-
+/*Hace un free de las variables dinamicas creadas*/
 void liberoPartida(sTablero tablero1,sTablero tablero2,sCasVacios casVacios){
     int i;
     for (i=0;i<tablero1.dim; i++){

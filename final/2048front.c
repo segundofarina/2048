@@ -181,7 +181,7 @@ int dificultad(){
 	return resp;
 }
 
-/* Decodifico el comando ingreado por el usuario a las aciones 
+/* Decodifico el comando ingresado por el usuario a las acciones 
 ** que realiza el juego */
 int pedirJugada(char fileName[]){
 	char comando[MAX_LENGTH_COMANDO];
@@ -260,7 +260,7 @@ int preguntoSave(){
 	return resp;
 }
 
-/* Pido solo el nombre del archivo y lo almaneno en un string */
+/* Pido solo el nombre del archivo y lo almaceno en un string */
 void preguntoFileName(char fileName[]){
 	char c;
 	int i=0;
@@ -273,7 +273,7 @@ void preguntoFileName(char fileName[]){
 	fileName[i]=0;
 }
 
-/* Imprimo tablero con formato acorde a la dimencion del tablero */
+/* Imprimo tablero con formato acorde a la dimension del tablero */
 void ImprimirTablero(sTablero tablero){
     int i,j;
     printf("PUNTAJE:%d\n",tablero.puntaje);
@@ -305,7 +305,7 @@ void ImprimirTablero(sTablero tablero){
     printf("\n");
 }
 
-/* Decodifico errores devueltos por el back-end e informo al usuraio del mimso */
+/* Decodifico errores devueltos por el back-end e informo al usuraio del mismo */
 void ImprimirError(int error){
 	switch(error){
 		case ERR_UNDO:
