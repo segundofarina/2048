@@ -162,7 +162,9 @@ int sumoFila(sMovimiento I, sMovimiento J, sTablero tablero1, sTablero * tablero
             tablero2->matriz[k][h]=tablero1.matriz[i][j];
             /* Me fijo si el numero que acabo de copiar se deberia sumar
             ** para combinar con el anterior de la fila-columna */
-            if( (k!=I.inicio || h!=J.inicio) && !sume && tablero2->matriz[k][h]==tablero2->matriz[k-I.incremento][h-J.incremento]){//si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico si el numero es igual al casillero anterior
+            if( (k!=I.inicio || h!=J.inicio) && !sume && tablero2->matriz[k][h]==tablero2->matriz[k-I.incremento][h-J.incremento]){
+            /*si no es el primer casillero de la fila-columna, y si no acabo de hacer una suma, verifico
+            **si el numero es igual al casillero anterior*/
                 /* Entro en la suma */
 
                 tablero2->matriz[k-I.incremento][h-J.incremento]*=2;/* Casillero anterior x2 */
@@ -403,7 +405,8 @@ int inicializo(sTablero * tablero1, sTablero * tablero2, sCasVacios * casVacios,
 ** Llama a las subfunciones que se encargan de realizar la jugada, devuelve si hubo un error y deja
 ** en parametros de salida si se gano o perdio la partida.
 */
-int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * estado,int movimientos[], int accion){
+int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVacios * casVacios, int * hiceUndo,int * estado,
+  int movimientos[], int accion){
     int error=0;
         if(accion==UNDO){
             if(tablero1->undos>0 && !*hiceUndo){
@@ -426,7 +429,7 @@ int jugar(sTablero * tablero1,sTablero * tablero2, sTablero * tableroAux,sCasVac
                     *estado=fperdi(movimientos, *tablero1);
                 }
             }
-            else if (movimientos[IZQUIERDA-1]==0&& movimientos[ARRIBA-1]==0&& movimientos[DERECHA-1]==0&& movimientos[ABAJO-1]==0&& tablero1->undos!=0){
+     	   else if(movimientos[IZQUIERDA-1]==0&&movimientos[ARRIBA-1]==0&&movimientos[DERECHA-1]==0&&movimientos[ABAJO-1]==0&&tablero1->undos!=0){
                 error=ERR_FORZADO;
             }
 
