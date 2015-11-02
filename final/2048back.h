@@ -58,7 +58,7 @@ typedef struct {
     unsigned short int ** matriz;
     int dim;
     unsigned short int undos;
-    unsigned short int puntaje;
+    unsigned int puntaje;
     int numGanador;
 } sTablero;
 
